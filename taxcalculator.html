@@ -1,0 +1,3524 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="taxCalcApp">
+<head>
+
+<!-- start jquery includes  -->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> -->
+<script src="js/jquery-2.1.3.min.js"></script> 
+<!-- <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css" /> -->
+<link rel="stylesheet" href="css/jquery-ui.css" /> 
+<script src="js/jquery-ui.min.js"></script> 
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+ end jquery ui includes -->
+
+
+<!-- start bootstrap includes -->
+<!-- Latest compiled and minified Bootstrap CSS -->
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="css/bootstrap.min.css" /> 
+
+<!-- Optional theme  -->
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css"> -->
+<link rel="stylesheet" href="css/bootstrap-theme.min.css" /> 
+
+<!-- Latest compiled and minified Bootstrap JavaScript 
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script> -->
+<script src="js/bootstrap.min.js"></script>
+<!-- end bootstrap includes -->
+
+<!-- start angular includes 
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script> -->
+<script src="js/angular.min.js"></script> 
+<!-- end angular includes -->
+
+<!-- start tax calculator includes
+<script type="text/javascript" src="taxcalulator.js"></script>
+end taxcaclulator includes -->
+
+<style>
+.fSummary {
+	cursor: pointer;
+}
+.fRow input{
+	/*width: 25%;*/
+	width = 50px;
+}
+.fRow span{
+	width: 75%;
+	/*max-width: 75%;*/
+	text-align: left;
+	white-space: normal;
+}
+.fRow span.finfo, .fdRow span.finfo {
+	width: 15px;
+	cursor: pointer;
+}
+.fdRow input{
+	/*width: 10%;*/
+	width = 50px;
+}
+.fdRow span{
+	width: 30%;
+	text-align: left;
+	white-space: normal;
+}
+.input-group {
+	width: 800px;
+}
+
+.inputdcol{
+	width: 400px;
+	width: 100%;
+	white-space: normal;
+}
+
+.inputdcol input{
+	width: 50px ! important;
+}
+</style>
+
+</head>
+<body ng-controller="TaxFormCtrl as vm">
+
+<div class="container">
+<h1> The Tax Calculator</h1>
+<div role="tabpanel">
+
+<!-- Nav tabs -->
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active"><a href="#f1040" role="tab" data-toggle="tab">Form 1040</a></li>
+    <li role="presentation"><a href="#w2" role="tab" data-toggle="tab">W-2</a></li>
+    <li role="presentation"><a href="#f1099g" role="tab" data-toggle="tab">1099-G</a></li>
+    <li role="presentation"><a href="#f1099int" role="tab" data-toggle="tab">1099-INT</a></li>
+    <li role="presentation"><a href="#f1099misc" role="tab" data-toggle="tab">1099-MISC</a></li>
+    <li role="presentation"><a href="#f1098" role="tab" data-toggle="tab">1098</a></li>
+    <li role="presentation"><a href="#f8962" role="tab" data-toggle="tab">Form 8962</a></li>
+    <!-- <li role="presentation"><a href="#f1099div" role="tab" data-toggle="tab">1099-DIV</a></li>
+    <li role="presentation"><a href="#f1099sa" role="tab" data-toggle="tab">1099-SA</a></li> -->
+    <li role="presentation"><a href="#schedA" role="tab" data-toggle="tab">Schedule A</a></li>
+    <li role="presentation"><a href="#schedSE" role="tab" data-toggle="tab">Schedule SE</a></li>
+    <li role="presentation"><a href="#schedC" role="tab" data-toggle="tab">Schedule C</a></li>
+    <li role="presentation" class="navbar-right"><a href="#about" role="tab" data-toggle="tab">About</a></li>
+  </ul>
+
+	<div class="tab-content">
+	
+	<div role="tabpanel" class="tab-pane" id="about">
+	<p>
+		Hi, welcome to the Tax Calculator.  Tax time is here, and this year I decided to build an app to do my taxes for me.
+		There are a number of reasons I decided to do this:
+		<ul>
+			<li> I always end up having to do several iterations of my taxes, which is really messy when using paper and pen. </li>
+			<li> I'm hoping that I can reuse the same basic infrastructure from year to year. </li>
+			<li> This gives me a chance to exercise my Bootstrap, Javascript, Angular, etc. muscles. </li>
+			<li> Maybe this will be a useful resource for someone else. </li>
+		</ul>
+		The main goal of Tax Calculator is to make it so that you don't every have to worry about 
+		deciphering all the random legalese language the IRS has to use. Just plug in your data from your tax documents, and 
+		boom! out spits a number.
+		<br><br>
+		So please poke around, give it a whirl, and if you're feeling generous, send me some feedback at alisavino -at- gmail.com.
+	</p>
+	<h4> How to use the Tax Calculator </h4>
+	<p>
+		<ol>
+			<li><b>Collect all your tax documents.</b> You should have received lots of documents you'll need to complete your taxes,
+			such as W-2s, 1099-Gs, 1099-INTs, 1095-SAs, 1099-DIVs, 1099-MISCs, and 1098s. Gather them together before you start. </li>
+			<li><b>Enter the data from your tax documents.</b> Once you have your necessary tax documents, start adding them under
+			the relevant tab.</li>
+			<li><b>Enter information into your 1040.</b> Once you have your tax document data entered, you can now fill out
+			the other 1040 lines which are not automatically filled by the Tax Calculator. If you see that you are missing
+			values that should be generated from other forms, use the Update 1040 button. </li>
+			<li><b>Fill out other forms as necessary.</b> These include Form 8962 for your health insurance credit, 
+			and Schedule C for business income. Again, if your values are not being filled automatically, click the various Update 
+			{form number/name} button at the bottom of your form. </li>
+			<li><b>Save your work.</b> Given the issues that certain tax preparation software has been having lately, I don't 
+			want <b>any</b> of your data. That's why some fields that ask for personal information, like social security number,
+			are not even included. To make sure I am never in possession of any of your financial data, the Tax Calculator only
+			uses HTML5 local storage, which means your data stays within your browser, and is never sent anywhere. To save your work
+			locally, click the Save All Data button you can find at the bottom of any tab. </li>	
+			<li><b>Check the results.</b> As I mention below, not an accountant, check against your own work. </li>
+		</ol>
+	</p>
+	<h4> Caveats </h4>
+	<p>
+		<ul>
+			<li><b>I am not an accountant!</b> You definitely should not being using this app as the be-all, end-all 
+			of figuring out your taxes. And I am pretty sure that probably not even legal. Nor would it be a smart move.
+			This app is in beta-beta-gamma ray mode, ie not even close to a real product. It is only meant as a useful 
+			way to organize your tax information and check your work. </li>
+			<li><b>This app is not optimized.</b> I don't expect a whole lot of traffic to this thing, so optimization 
+			is not a top priority. Yes, it needs to be minified, and there are plenty of hosting config stuff I could do. Some day, 
+			just not today. Same with cleaning up and modularizing the code, utilizing HTML5 types and validation, angularizing
+			big segments of the html, and a bunch of other stuff. </li>
+			<li><b>The functionality is not done yet.</b> Right now, there are still plenty of forms, worksheets, and lookup 
+			tables that are only half done or not done at all. And there are lots of bells and whistles to make usability 
+			Apple-level that is coming. If there is something missing that is blocking you, please please let me know, and I 
+			will (probably) prioritize it higher. </li>
+		</ul>
+	</p> 
+	<h4> In the Pipeline </h4> 
+	<p>
+	This is a running list of functionality that I am currently working on/want to be working on soon. Send me some feedback,
+	and I will add to it!
+		<ul>
+			<li><b>Expand for information (In Progress)</b> There is lots of information on how a value gets calculated from the IRS.  
+			It would make things so much easier if we could display it within the form itself. </li>
+			<li><b>Line item value overrides (In Progress)</b> Several inputs on Form 1040, Schedule C, Form 8962, are derived from other
+			inputs ot table lookups. Want to have a way for users to say, "Use the value I specify, not the calculated one." </li>
+			<li><b>Handle Filing Statuses other than Single</b> Done! </li>
+			<li><b>Additional forms</b> Now have 1098s and Schedule A! Need to do clean up of Schedule C and Form 8962, add 1099-DIV</li>
+			<li><b>Comments by line item</b> I would love to hive-mind this project by allowing users to comment on the
+			functionality by line item, and to react to other's comments. </li>
+			<li><b>Badges for form counts</b> A nice visual to tell how many of each form type you have stored at a glance. </li>
+			<li><b>Make things pretty</b> Try to force consistent row widths, replace ugly jquery modals with something 
+			pretty from Bootstrap or elsewhere. Add Steps to make the order to do things more obvious. </li>
+			<li><b>Smart Updating</b> It would be cool that if a user changed any value, the ramifications would ripple through
+			the rest of the forms. </li>
+		</ul>
+	</p>
+	</div> <!-- end about tabpanel -->
+	
+	<div role="tabpanel" class="tab-pane" id="w2">
+	<h2> W-2 </h2>
+    <form ng-submit="updateForm()">
+    <div class="row" ng-model="w2s">
+    <div class="col-md-6 fSummary" ng-repeat="w2 in w2s">
+
+      <span><b>Name: {{w2.name}}</b></span>
+      <span class="glyphicon glyphicon-remove" style="float: right" 
+      	ng-click="deleteForm('w2', $index, w2.name)"></span>
+  		<span class="glyphicon glyphicon-edit" style="float: right; margin-right: 10px" 
+  		ng-click="editForm('w2', w2, $index)"></span>
+	  <br>
+      <span ng-show="w2.box1" >Box 1. Wages, tips, other comp.: {{w2.box1}}<br></span>
+      <span ng-show="w2.box2">Box 2. Federal income tax withheld: {{w2.box2}}<br></span>
+      <span ng-show="w2.box3">Box 3. Social security wages: {{w2.box3}}<br></span>
+      <span ng-show="w2.box4">Box 4. Social security tax withheld: {{w2.box4}}<br></span>
+      <span ng-show="w2.box5">Box 5. Medicare wages and tips: {{w2.box5}}<br></span>
+      <span ng-show="w2.box6">Box 6. Medicare tax withheld: {{w2.box6}}<br></span>
+      <span ng-show="w2.box7">Box 7. Social security tips: {{w2.box7}}<br></span>
+      <span ng-show="w2.box8">Box 8. Allocated tips: {{w2.box8}}<br></span>
+      <span ng-show="w2.box9">Box 9.  {{w2.box9}}<br></span>
+      <span ng-show="w2.box10">Box 10. Dependent care benefits: {{w2.box10}}<br></span>
+      <span ng-show="w2.box11">Box 11. Nonqualified plans: {{w2.box11}}<br></span>
+      <span ng-show="w2.box12a">Box 12a. See instructions for box 12: {{w2.box12a}}<br></span>
+      <span ng-show="w2.box13">Box 13. Stat emp/Ret. plan/3rd party sick pay: {{w2.box13}}<br></span>
+      <span ng-show="w2.box14">Box 14. Other: {{w2.box14}}<br></span>
+      <span ng-show="w2.box15">Box 15. State: {{w2.box15}}<br></span>
+      <span ng-show="w2.box16">Box 16. State wages, tips, etc.: {{w2.box16}}<br></span>
+      <span ng-show="w2.box17">Box 17. State income tax: {{w2.box17}}<br></span>
+      <span ng-show="w2.box18">Box 18. Local wages, tips, etc.: {{w2.box18}}<br></span>
+      <span ng-show="w2.box19">Box 19. Local income tax: {{w2.box19}}<br></span>
+      <span ng-show="w2.box20">Box 20. Locality name: {{w2.box20}}<br></span>
+    </div>
+    </div>
+    
+    <br>
+    <a class="btn btn-primary" data-toggle="collapse" href="#collapsew2" 
+    id="w2add" ng-click="addForm('w2')">Add a W-2</a><br><br>
+
+	<div class="collapse" id="collapsew2">
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Name:</span>
+      <input type="text" placeholder="Give your W-2 a name to make tracking easier" 
+      class="form-control" ng-model="fedit['w2'].name" name="w2name" id="w2name">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 1:</span>
+      <input type="text" placeholder="Wages, tips, other comp." 
+      class="form-control" ng-model="fedit['w2'].box1" name="w2box1" id="w2box1">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 2:</span>
+      <input type="text" placeholder="Federal income tax withheld" class="form-control"
+      ng-model="fedit['w2'].box2" name="w2box2" id="w2box2">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 3:</span>
+      <input type="text" placeholder="Social security wages" class="form-control" 
+      ng-model="fedit['w2'].box3" name="w2box3" id="w2box3">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 4:</span>
+      <input type="text" placeholder="Social security tax withheld" class="form-control" 
+      ng-model="fedit['w2'].box4" name="w2box4" id="w2box4">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 5:</span>
+      <input type="text" placeholder="Medicare wages and tips" class="form-control" 
+      ng-model="fedit['w2'].box5" name="w2box5" id="w2box5">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 6:</span>
+      <input type="text" placeholder="Medicare tax withheld" class="form-control" 
+      ng-model="fedit['w2'].box6" name="w2box6" id="w2box6">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 7:</span>
+      <input type="text" placeholder="Social security tips" class="form-control" 
+      ng-model="fedit['w2'].box7" name="w2box7" id="w2box7">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 8:</span>
+      <input type="text" placeholder="Allocated tips:" class="form-control" 
+      ng-model="fedit['w2'].box8" name="w2box8" id="w2box8">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 9:</span>
+      <input type="text" placeholder="" class="form-control" 
+      ng-model="fedit['w2'].box9" name="w2box9" id="w2box9" disabled>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 10:</span>
+      <input type="text" placeholder="Dependent care benefits" class="form-control" 
+      ng-model="fedit['w2'].box10" name="w2box10" id="w2box10">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 11:</span>
+      <input type="text" placeholder="Nonqualified plans" class="form-control" 
+      ng-model="fedit['w2'].box11" name="w2box11" id="w2box11">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 12a:</span>
+      <input type="text" placeholder="See instructions for box 12" class="form-control" 
+      ng-model="fedit['w2'].box12a" name="w2box12a" id="w2box12a">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 13:</span>
+      <input type="text" placeholder=" Stat emp/Ret. plan/3rd party sick pay" class="form-control" 
+      ng-model="fedit['w2'].box13" name="w2box13" id="w2box13" disabled>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 14:</span>
+      <input type="text" placeholder="Other" class="form-control" 
+      ng-model="fedit['w2'].box14" name="w2box14" id="w2box14">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 15:</span>
+      <input type="text" placeholder="State" class="form-control" 
+      ng-model="fedit['w2'].box15" name="w2box15" id="w2box15">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 16:</span>
+      <input type="text" placeholder="State wages, tips, etc." class="form-control" 
+      ng-model="fedit['w2'].box16" name="w2box16" id="w2box16">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 17:</span>
+      <input type="text" placeholder="State income tax" class="form-control" 
+      ng-model="fedit['w2'].box17" name="w2box17" id="w2box17">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 18:</span>
+      <input type="text" placeholder="Local wages, tips, etc." class="form-control" 
+      ng-model="fedit['w2'].box18" name="w2box18" id="w2box18">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 19:</span>
+      <input type="text" placeholder="Local income tax" class="form-control" 
+      ng-model="fedit['w2'].box19" name="w2box19" id="w2box19">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 20:</span>
+      <input type="text" placeholder="Locality name" class="form-control" 
+      ng-model="fedit['w2'].box20" name="w2box20" id="w2box20">
+    </div>
+    <br>
+    
+    <div class="input-group">
+        <button class="btn" type="submit" value="add">update W-2</button>
+    </div>
+    
+    </div> <!-- end collapsew2 -->
+    </form>
+    </div>
+    
+    <div role="tabpanel" class="tab-pane" id="f1099g">
+    <h2> Form 1099-G </h2>
+    <form ng-submit="updateForm()">
+    <div class="row" ng-model="form1099gs">
+    <div class="col-md-6 fSummary" ng-repeat="form1099g in form1099gs">
+    <div>
+      <span><b>Name: {{form1099g.name}}</b></span>
+      	<span class="glyphicon glyphicon-remove" style="float: right" 
+      	ng-click="deleteForm('form1099g', $index, form1099g.name)"></span>
+  		<span class="glyphicon glyphicon-edit" style="float: right; margin-right: 10px" 
+  		ng-click="editForm('form1099g', form1099g, $index)"></span>
+	  <br>
+      <span ng-show="form1099g.box1">Box 1. Unemployment Compensation: {{form1099g.box1}}<br></span>
+      <span ng-show="form1099g.box2">Box 2. State or local income tax refunds, credits, or offsets: {{form1099g.box2}}<br></span> 
+      <span ng-show="form1099g.box3">Box 3. Box 2 amount is for tax year: {{form1099g.box3}}<br></span>
+      <span ng-show="form1099g.box4">Box 4. Federal income tax withheld: {{form1099g.box4}}<br></span>
+      <span ng-show="form1099g.box5">Box 5. ATAA payments: {{form1099g.box5}}<br></span>
+      <span ng-show="form1099g.box6">Box 6. Taxable Grants: {{form1099g.box6}}<br></span>
+      <span ng-show="form1099g.box7">Box 7. Agricultural payments: {{form1099g.box7}}<br></span>
+      <span ng-show="form1099g.box8">Box 8. Check if box 2 is trade or business income: {{form1099g.box8}}<br></span>
+      <span ng-show="form1099g.box9">Box 9. Market Gain: {{form1099g.box9}}<br></span>
+      <span ng-show="form1099g.box10">Box 10a. State: {{form1099g.box10}}<br></span>
+      <span ng-show="form1099g.box11">Box 11. State income tax withheld: {{form1099g.box11}}<br></span>
+    </div><br>
+    </div>
+    </div>
+	<br>
+	<a class="btn btn-primary" data-toggle="collapse" href="#collapseform1099g" 
+     ng-click="addForm('form1099g')" id="form1099gadd">Add a Form 1099-G</a>
+    <br><br>
+    
+    <div class="collapse" id="collapseform1099g">
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">PAYER's Name: </span>
+      <input type="text" placeholder="Give your 1099-G a name for easier tracking." ng-model="fedit['form1099g'].name"
+      class="form-control" name="f1099gname" id="f1099gname">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span id="basic-addon1" class="input-group-addon">Box 1: Unemployment Compensation </span>
+      <input type="text" placeholder="See instructions for Form 1040, line 19" 
+      class="form-control" ng-model="fedit['form1099g'].box1" name="f1099gbox1" id="f1099gbox1">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span id="basic-addon1" class="input-group-addon">Box 2: State or local income tax refunds, credits, or offsets </span>
+      <input type="text" placeholder="See instructions for Form 1040, line 10.  If box 8 on
+     Form 1099-G is checked, see box 8 instructions." 
+      class="form-control" ng-model="fedit['form1099g'].box2" name="f1099gbox2" id="f1099gbox2">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 3: Box 2 amount is for tax year</span>
+      <input type="text" aria-describedby="basic-addon1" placeholder="" 
+      class="form-control" ng-model="fedit['form1099g'].box3" name="f1099gbox3" id="f1099gbox3">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 4: Federal income tax withheld </span>
+      <input type="text" aria-describedby="basic-addon1" placeholder="" 
+      class="form-control" ng-model="fedit['form1099g'].box4" name="f1099gbox4" id="f1099gbox4">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 5: ATAA payments </span>
+      <input type="text" aria-describedby="basic-addon1" placeholder="Form 1040, line 21" 
+      class="form-control" ng-model="fedit['form1099g'].box5" name="f1099gbox5" id="f1099gbox5">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 6: Taxable Grants </span>
+      <input type="text" aria-describedby="basic-addon1" placeholder="Form 1040, line 21" 
+      class="form-control" ng-model="fedit['form1099g'].box6" name="f1099gbox6" id="f1099gbox6">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 7: Agricultural payments </span>
+      <input type="text" aria-describedby="basic-addon1" placeholder="See instructions for Schedule F or Publication 225" 
+      class="form-control" ng-model="fedit['form1099g'].box7" name="f1099gbox7" id="f1099gbox7">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 9: Market Gain</span>
+      <input type="text" aria-describedby="basic-addon1" placeholder="See instructions for Schedule F" 
+      class="form-control" ng-model="fedit['form1099g'].box9" name="f1099gbox9" id="f1099gbox9">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 11: State income tax withheld</span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099g'].box11" name="f1099gbox11" id="f1099gbox11">
+    </div>
+    <br>
+    <div class="input-group">
+        <button class="btn" type="submit" value="update">update Form 1099-G</button>
+    </div>
+    <br>
+    </div> <!-- end collapseform1099g -->
+    </form>
+    </div> <!-- end f1099g tabpanel -->
+    
+    <div role="tabpanel" class="tab-pane" id="f1098">
+    <h2> Form 1098 </h2>
+    <form ng-submit="updateForm()">
+    <div class="row" ng-model="form1098s">
+    <div class="col-md-6 fSummary" ng-repeat="form1098 in form1098s">
+    <div>
+      <span><b>Name: {{form1098.name}}</b></span>
+      	<span class="glyphicon glyphicon-remove" style="float: right" 
+      	ng-click="deleteForm('form1098', $index, form1098.name)"></span>
+  		<span class="glyphicon glyphicon-edit" style="float: right; margin-right: 10px" 
+  		ng-click="editForm('form1098', form1098, $index)"></span>
+	  <br>
+      <span ng-show="form1098.box1">Box 1. Mortgage interest received from payer(s)/borrower(s): {{form1098.box1}}<br></span>
+      <span ng-show="form1098.box2">Box 2. Points paid on purchase of principal residence: {{form1098.box2}}<br></span> 
+      <span ng-show="form1098.box3">Box 3. Refund of overpaid interest: {{form1098.box3}}<br></span>
+      <span ng-show="form1098.box4">Box 4. {{form1098.box4}}<br></span>
+      <span ng-show="form1098.box5">Box 5. {{form1098.box5}}<br></span>
+    </div><br>
+    </div>
+    </div>
+	<br>
+	<a class="btn btn-primary" data-toggle="collapse" href="#collapseform1098" 
+     ng-click="addForm('form1098')" id="form1098add">Add a Form 1098</a>
+    <br><br>
+    
+    <div class="collapse" id="collapseform1098">
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">PAYER's Name: </span>
+      <input type="text" placeholder="Give your 1098 a name for easier tracking." ng-model="fedit['form1098'].name"
+      class="form-control" name="f1098name" id="f1098name">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span id="basic-addon1" class="input-group-addon">Box 1: Mortgage interest received from payer(s)/borrower(s) </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1098'].box1" name="f1098box1" id="f1098box1">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span id="basic-addon1" class="input-group-addon">Box 2: Points paid on purchase of principal residence </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1098'].box2" name="f1098box2" id="f1098box2">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 3: Refund of overpaid interest </span>
+      <input type="text" placeholder="" class="form-control" ng-model="fedit['form1098'].box3" name="f1098box3" id="f1098box3">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 4: Federal income tax withheld </span>
+      <input type="text" placeholder="" class="form-control" ng-model="fedit['form1098'].box4" name="f1098box4" id="f1098box4">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 5: </span>
+      <input type="text" placeholder="" class="form-control" ng-model="fedit['form1098'].box5" name="f1098box5" id="f1098box5">
+    </div>
+    <br>
+    
+    <div class="input-group">
+        <button class="btn" type="submit" value="update">update Form 1098</button>
+    </div>
+    <br>
+    </div> <!-- end collapseform1098 -->
+    </form>
+    </div> <!-- end f1098 tabpanel -->
+    
+    <div role="tabpanel" class="tab-pane" id="f1099int">
+    <h2>Form 1099-INT</h2>
+    
+    <form ng-submit="updateForm()">
+    <div class="row">
+    <div class="col-md-6 fSummary" ng-repeat="form1099int in form1099ints">
+      <span><b>Name: {{form1099int.name}}</b></span>
+      <span class="glyphicon glyphicon-remove" style="float: right" 
+      	ng-click="deleteForm('form1099int', $index, form1099int.name)"></span>
+  		<span class="glyphicon glyphicon-edit" style="float: right; margin-right: 10px" 
+  		ng-click="editForm('form1099int', form1099int, $index)"></span>
+	  <br>
+      <span ng-show="form1099int.box1">Box 1. Interest income: {{form1099int.box1}}<br></span>
+      <span ng-show="form1099int.box2">Box 2. Early withdrawal penalty: {{form1099int.box2}}<br></span>
+      <span ng-show="form1099int.box3">Box 3. Interest on U.S. Savings Bonds and Treas. obligations: {{form1099int.box3}}<br></span>
+      <span ng-show="form1099int.box4">Box 4. Federal income tax withheld: {{form1099int.box4}}<br></span>
+      <span ng-show="form1099int.box5">Box 5. Investment expenses: {{form1099int.box5}}<br></span>
+      <span ng-show="form1099int.box6">Box 6. Foreign tax paid: {{form1099int.box6}}<br></span>
+      <span ng-show="form1099int.box7">Box 7. Foreign Country or U.S. possession: {{form1099int.box7}}<br></span>
+      <span ng-show="form1099int.box8">Box 8. Tax-exempt interest: {{form1099int.box8}}<br></span>
+      <span ng-show="form1099int.box9">Box 9. Specified private activity bond interest: {{form1099int.box9}}<br></span>
+      <span ng-show="form1099int.box10">Box 10. Market discount: {{form1099int.box10}}<br></span>
+      <span ng-show="form1099int.box11">Box 11. Bond premium: {{form1099int.box11}}<br></span>
+      <span ng-show="form1099int.box12">Box 12. Tax-exempt bond CUSIP no.: {{form1099int.box12}}<br></span>
+      <span ng-show="form1099int.box13">Box 13. State: {{form1099int.box13}}<br></span>
+      <span ng-show="form1099int.box14">Box 14. State identification no.: {{form1099int.box14}}<br></span>
+      <span ng-show="form1099int.box15">Box 15. State tax withheld: {{form1099int.box15}}<br></span>
+    </div>
+  </div>
+    <br>
+    <a class="btn btn-primary" data-toggle="collapse" href="#collapseform1099int" 
+    ng-click="addForm('form1099int')" id="form1099intadd">Add a Form 1099-INT</a>
+    <br><br>
+    <div class="collapse" id="collapseform1099int">
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">PAYER's Name: </span>
+      <input type="text" placeholder="Give your 1099-INT a name for easier tracking." 
+      class="form-control" ng-model="fedit['form1099int'].name" name="f1099intname" id="f1099intname">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 1: Interest income </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box1" name="f1099intbox1" id="f1099intbox1">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 2: Early withdrawal penalty </span>
+      <input type="text"  placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box2" name="f1099intbox2" id="f1099intbox2">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 3: Interest on U.S. Savings Bonds and Treas. obligations </span>
+      <input type="number" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box3" name="f1099intbox3" id="f1099intbox3">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 4: Federal income tax withheld </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box4" name="f1099intbox4" id="f1099intbox4">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 5: Investment expenses </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box5" name="f1099intbox5" id="f1099intbox5">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 6: Foreign tax paid </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box6" name="f1099intbox6" id="f1099intbox6">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 7: Foreign Country or U.S. possession </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box7" name="f1099intbox7" id="f1099intbox7">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 8: Tax-exempt interest </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box8" name="f1099intbox8" id="f1099intbox8">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 9: Specified private activity bond interest </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box9" name="f1099intbox9" id="f1099intbox9">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 10: Market discount </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box10" name="f1099intbox10" id="f1099intbox10">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 11: Bond premium </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box11" name="f1099intbox11" id="f1099intbox11">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 12: Tax-exempt bond CUSIP no. </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box12" name="f1099intbox12" id="f1099intbox12">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 13: State </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box13" name="f1099intbox13" id="f1099intbox13">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 14: State identification no. </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box14" name="f1099intbox14" id="f1099intbox14">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 15: State tax withheld</span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099int'].box15" name="f1099intbox15" id="f1099intbox15">
+    </div>
+    <br>
+    
+    <div class="input-group">
+        <button class="btn" type="submit" value="update">update Form 1099-INT</button>
+    </div>
+    <br>
+    </div> <!-- end collapseform1099int -->
+    </form>
+    </div> <!-- end f1099int tabpanel -->
+    
+    <div role="tabpanel" class="tab-pane" id="f1099misc">
+    <h2> Form 1099-MISC </h2>
+    <!--class="bs-example bs-example-form" -->
+    <form  ng-submit="updateForm()">
+    <div class="row">
+    <div class="col-md-6" ng-repeat="form1099misc in form1099miscs">
+      <span><b>Name: {{form1099misc.name}}</b></span>
+      <span class="glyphicon glyphicon-remove" style="float: right" 
+      	ng-click="deleteForm('form1099misc', $index, form1099misc.name)"></span>
+  		<span class="glyphicon glyphicon-edit" style="float: right; margin-right: 10px" 
+  		ng-click="editForm('form1099misc', form1099misc, $index)"></span>
+	  <br>
+      <span ng-show="form1099misc.box1">Box 1. Rents: {{form1099misc.box1}}<br></span>
+      <span ng-show="form1099misc.box2">Box 2. Royalties: {{form1099misc.box2}}<br></span>
+      <span ng-show="form1099misc.box3">Box 3. Other income: {{form1099misc.box3}}<br></span>
+      <span ng-show="form1099misc.box4">Box 4. Federal income tax withheld: {{form1099misc.box4}}<br></span>
+      <span ng-show="form1099misc.box5">Box 5. Fishing boat proceeds: {{form1099misc.box5}}<br></span>
+      <span ng-show="form1099misc.box6">Box 6. Medical and health care payments: {{form1099misc.box6}}<br></span>
+      <span ng-show="form1099misc.box7">Box 7. Nonemployee compensations: {{form1099misc.box7}}<br></span>
+      <span ng-show="form1099misc.box8">Box 8. Substitute payments in lieu of dividends or interest: {{form1099misc.box8}}<br></span>
+      <span ng-show="form1099misc.box9">Box 9. Payer made direct sales of $5,000 or more of consumer products to a buyer for resale: {{form1099misc.box9}}<br></span>
+      <span ng-show="form1099misc.box10">Box 10. Crop insurance proceeds: {{form1099misc.box10}}<br></span>
+      <span ng-show="form1099misc.box11">Box 11. {{form1099misc.box11}}<br></span>
+      <span ng-show="form1099misc.box12">Box 12. {{form1099misc.box12}}<br></span>
+      <span ng-show="form1099misc.box13">Box 13. Excess golden parachute payments: {{form1099misc.box13}}<br></span>
+      <span ng-show="form1099misc.box14">Box 14. Gross proceeds paid to an attorney: {{form1099misc.box14}}<br></span>
+      <span ng-show="form1099misc.box15a">Box 15a. Section 409A deferrals: {{form1099misc.box15a}}<br></span>
+      <span ng-show="form1099misc.box15b">Box 15b. Section 409A income: {{form1099misc.box15b}}<br></span>
+      <span ng-show="form1099misc.box16">Box 16. State tax withheld: {{form1099misc.box16}}<br></span>
+      <span ng-show="form1099misc.box17">Box 17. State/Payer's state no.: {{form1099misc.box17}}<br></span>
+      <span ng-show="form1099misc.box18">Box 18. State income: {{form1099misc.box18}}<br></span>
+    </div>
+  </div>
+  <br>
+  <a class="btn btn-primary" data-toggle="collapse" href="#collapseform1099misc" 
+  ng-click="addForm('form1099misc')" id="form1099miscadd">Add a Form 1099-MISC</a>
+  <br><br>
+  
+    <div class="collapse" id="collapseform1099misc">
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">PAYER's Name: </span>
+      <input type="text" placeholder="Give your 1099-MISC a name for easier tracking." 
+      class="form-control" ng-model="fedit['form1099misc'].name" name="f1099miscname" id="f1099miscname">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 1: Rents </span>
+      <input type="text" placeholder="" class="form-control" ng-model="fedit['form1099misc'].box1" 
+      name="f1099miscbox1" id="f1099miscbox1">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 2: Royalties </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box2" name="f1099miscbox2" id="f1099miscbox2">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 3: Other income </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box3" name="f1099miscbox3" id="f1099miscbox3">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 4: Federal income tax withheld </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box4" name="f1099miscbox4" id="f1099miscbox4">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 5: Fishing boat proceeds </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box5" name="f1099miscbox5" id="f1099miscbox5">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 6: Medical and health care payments </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box6" name="f1099miscbox6" id="f1099miscbox6">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 7: Nonemployee compensations </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box7" name="f1099miscbox7" id="f1099miscbox7">
+    </div>
+    <br>
+
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 8: Substitute payments in lieu of dividends or interest </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box8" name="f1099miscbox8" id="f1099miscbox8">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 9: Payer made direct sales of $5,000 or more of consumer products to a buyer for resale </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box9" name="f1099miscbox9" id="f1099miscbox9">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 11: </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box11" name="f1099miscbox11" id="f1099miscbox11">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 12: </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box12" name="f1099miscbox12" id="f1099miscbox12">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 13: Excess golden parachute payments </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box13" name="f1099miscbox13" id="f1099miscbox13">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 14: Gross proceeds paid to an attorney </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box14" name="f1099miscbox14" id="f1099miscbox14">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 15a: Section 409A deferrals </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box15a" name="f1099miscbox15a" id="f1099miscbox15a">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 15b: Section 409A income </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box15b" name="f1099miscbox15b" id="f1099miscbox15b">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 16: State tax withheld </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box16" name="f1099miscbox16" id="f1099miscbox16">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 17: State/Payer's state no. </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box17" name="f1099miscbox17" id="f1099miscbox17">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon">Box 18: State income </span>
+      <input type="text" placeholder="" 
+      class="form-control" ng-model="fedit['form1099misc'].box18" name="f1099miscbox18" id="f1099miscbox18">
+    </div>
+    <br>
+    
+    <div class="input-group">
+        <button class="btn" type="submit" value="update">update Form 1099-MISC</button>
+    </div>
+    </div> <!-- end collapseform1099misc -->
+    </form>
+    </div> <!-- end f1099misc tabpanel -->
+    
+    <div role="tabpanel" class="tab-pane" id="f1099div">
+    <h2> Form 1099-DIV </h2>
+    <i>Coming Soon. This is for the reporting of dividends, corresponding to 1040 lines 9a and 9b.</i>
+    </div> <!-- end f1099div tabpanel -->
+    
+    <div role="tabpanel" class="tab-pane" id="f1099sa">
+    <h2> Form 1099-SA </h2>
+    <i>Coming Soon.</i>
+    </div> <!-- end f1099sa tabpanel -->
+    
+    <div role="tabpanel" class="tab-pane active" id="f1040">
+    <h2> Form 1040 </h2>
+    
+    <br>
+	<a class="btn btn-primary" data-toggle="collapse" href="#collapseform1040" 
+     ng-click="addForm('form1040')" id="form1040add">Add a Form 1040</a>
+    <br><br>
+    
+    <div class="collapse" id="collapseform1040">
+    <form ng-repeat="f1040 in form1040" ng-model="f1040" ng-submit="update1040(form1040[0], 0 , true)" 
+    class="form-horizontal" role="form" id="form1040">
+    
+    <h3> Filing Status </h3>
+    <div class="row"">
+    <div class="col-md-6">
+    <div class="checkbox-inline">
+      <label>
+    	 <input type="checkbox" ng-model="f1040.line1" name="f1040status" class="filingStatus" id="f1040line1" value="">
+    	 1. Single
+  	  </label>   
+    </div>
+    <br>
+    
+    <div class="checkbox-inline">
+      <label>
+    	 <input type="checkbox" ng-model="f1040.line2" name="f1040status" class="filingStatus" id="f1040line2" value="">
+    	 2. Married
+  	  </label>   
+    </div>
+    <br>
+    
+    <div class="checkbox-inline">
+      <label>
+    	 <input type="checkbox" ng-model="f1040.line3" name="f1040status" class="filingStatus" id="f1040line3" value="">
+    	 3. Married filing separately
+  	  </label>   
+    </div>
+    <br>
+    </div>
+    <div class="col-md-6">
+    <div class="checkbox-inline">
+      <label>
+    	 <input type="checkbox" ng-model="f1040.line4" name="f1040status" class="filingStatus" id="f1040line4" value="">
+    	 4. Head of household 
+  	  </label>   
+    </div>
+    <br>
+    
+    <div class="checkbox-inline">
+      <label>
+    	 <input type="checkbox" ng-model="f1040.line5" name="f1040status" class="filingStatus" id="f1040line5" value="">
+    	 5. Qualifying widow(er) with dependent child 
+  	  </label>   
+    </div>
+    <br>
+    
+    </div>
+    </div> <!-- end filing status checkboxes -->
+    
+    <h3> Exemptions </h3>
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line6dInfo" data-toggle="collapse"> </span>
+      <span class="input-group-addon"> 6d. Total number of exemptions claimed</span>
+      <input type="text" ng-model="f1040.line6d" class="form-control incomeCalc" name="f1040line6d" id="f1040line6d">
+    </div>
+    <div id="f1040line6dInfo" class="collapse well well-sm">
+    <p>
+    	How to calculate your exemptions:
+    	<ol>
+    		<li>Add one for yourself, if no one else is claiming you as a dependent.</li>
+    		<li>Add one for your spouse, if you are filing jointly.</li>
+    		<li>Add one for each dependent that lives with you.*</li>
+    	</ol>
+    	This total is the number of exemptions you should take.<br>
+    	* There is special calculations you need to do if you have a dependent who does not live with you due to divorce or separation.
+    </p>
+    </div>
+    <br>
+    
+    
+    <h3> Income </h3>
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line7Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">7. Wages, salaries, tips, etc. Attach Form(s) W-2</span>
+      <input type="text" ng-model="f1040.line7" class="form-control incomeCalc" name="f1040line7" id="f1040line7">
+    </div>
+    <div id="f1040line7Info" class="collapse well well-sm">
+    <p>
+    	This value is generated by the Tax Calculator. It is the sum of W-2 box 1 values you have specified in the W-2 tab.
+    </p>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fdRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line8aInfo" data-toggle="collapse"> </span>
+      <span class="input-group-addon">8a. Taxable interest. </span>
+      <input type="text" ng-model="f1040.line8a" class="form-control incomeCalc" name="f1040line8a" id="f1040line8a">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line8bInfo" data-toggle="collapse"> </span> 
+      <span class="input-group-addon" data-toggle="tooltip" data-placement="top" title="">8b. Tax-exempt interest. </span>
+      <input type="text" ng-model="f1040.line8b" class="form-control" name="f1040line8b" id="f1040line8b">
+    </div>
+    <div id="f1040line8aInfo" class="collapse well well-sm">
+    <p>
+    	This value is generated by the Tax Calculator. It is the sum of 1099-INT box 1 values you have specified in the 1099-INT 
+    	tab. If this value is greater than $1500, a Schedule B is required.
+    </p><p>
+    	From the IRS:<br>
+    	Attach Schedule B if required.
+    	<br><br>
+    	Tax-Exempt Interest:<br>
+      	If you received any tax-exempt interest, such as from municipal bonds, each payer should send you a Form 1099-INT.
+		Your tax-exempt interest should be shown in box 8 of Form 1099-INT. Enter the total on line 8b. Also include on
+		line 8b any exempt-interest dividends from a mutual fund or other regulated investment company. This amount should be shown in box 10 of Form 1099-DIV.
+		<br><br>
+		Do not include interest earned on your IRA, health savings account, Archer or Medicare Advantage MSA, or
+		Coverdell education savings account.
+    </p>
+    </div>
+    <div id="f1040line8bInfo" class="collapse well well-sm">
+    <p>
+    	This value is generated by the Tax Calculator. It is the sum of 1099-INT box 8 values you have specified in the 
+    	1099-INT tab. This <b>does not</b> include the values from 1099-DIV box 10, which has not been implemented yet.
+    </p><p>
+    	From the IRS:<br>
+    	Do not include on line 8a
+    </p>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fdRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line9aInfo" data-toggle="collapse"> </span>
+      <span class="input-group-addon">9a. Ordinary dividends. </span>
+      <input type="text" ng-model="f1040.line9a" class="form-control incomeCalc" name="f1040line9a" id="f1040line9a">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line9bInfo" data-toggle="collapse"> </span>
+	  <span class="input-group-addon">9b. Qualified dividends </span>
+      <input type="text" ng-model="f1040.line9b" class="form-control" name="f1040line9b" id="f1040line9b">
+      
+    </div>
+    <div id="f1040line9aInfo" class="collapse well well-sm">
+    <p>
+    	The calculation for this value is not implemented yet. It will be the sum of 1099-DIV box 1a values you will
+    	be able to specify in the future 1099-DIV tab. If this value is greater than $1500, a Schedule B is required.
+    </p><p>
+    	From the IRS:<br>
+    	Attach Schedule B if required. 
+    	<br><br>
+    	Each payer should send you a Form 1099-DIV. Enter your total ordinary dividends on line 9a. This amount should
+		be shown in box 1a of Form(s) 1099-DIV.<br>
+		You must fill in and attach Schedule B if the total is over $1,500 or you
+		received, as a nominee, ordinary dividends that actually belong to someone else.
+		<br><br>
+		Nondividend Distributions:<br>
+		Some distributions are a return of your cost (or other basis). They will not be
+		taxed until you recover your cost (or other basis). You must reduce your cost
+		(or other basis) by these distributions. After you get back all of your cost (or
+		other basis), you must report these distributions as capital gains on Form 8949.<br>
+		For details, see Pub. 550.
+    </p>
+    </div>
+    <div id="f1040line9bInfo" class="collapse well well-sm">
+    <p>
+    	The calculation for this value is not implemented yet. It will be the sum of 1099-DIV box 1b values you will
+    	be able to specify in the future 1099-DIV tab.
+    </p>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line10Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon" title="">10. Taxable refunds, credits, or offsets of state and local income taxes </span>
+      <input type="text" ng-model="f1040.line10" class="form-control incomeCalc" name="f1040line10" id="f1040line10">
+    </div>
+    <div id="f1040line10Info" class="collapse well well-sm">
+    <p>
+    	The value is generated by the Tax Calculator. It is the sum of 1099-G box 2 values you have specified
+    	in the 1099-G tab. 
+    </p><p>
+    	From the IRS:<br>
+    	TIP - None of your refund is taxable if, in the year you paid the tax, you either (a) did not itemize deductions, 
+    	or (b) elected to deduct state and local general sales taxes instead of state and local income taxes.
+    	<br><br>
+    	If you received a refund, credit, or offset of state or local income taxes in 2014, you may be required to report this 
+    	amount. If you did not receive a Form 1099-G, check with the government agency that made the payments to you. Your 
+    	2014 Form 1099-G may have been made available to you only in an elec- tronic format, and you will need to get instructions 
+    	from the agency to retrieve this document. Report any taxable refund you received even if you did not receive Form 1099-G.
+    	<br><br>
+    	If you chose to apply part or all of the refund to your 2014 estimated state or local income tax, the amount applied is
+		treated as received in 2014. If the refund was for a tax you paid in 2013 and you
+		deducted state and local income taxes on line 5 of your 2013 Schedule A, use the
+		State and Local Income Tax Refund Worksheet in these instructions to see if any of your refund is taxable.
+    </p>
+    <p>
+    	TODO: Add State and Local Income Tax Refund Worksheet
+    </p>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line11Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">11. Alimony received </span>
+      <input type="text" ng-model="f1040.line11" class="form-control incomeCalc" name="f1040line11" id="f1040line11">
+    </div>
+    <div id="f1040line11Info" class="collapse well well-sm">
+    <p>
+    	From the IRS:<br>
+    	Enter amounts received as alimony or separate maintenance. You must let the person 
+    	who made the payments know your social security number. If you do not, you may have 
+    	to pay a penalty. For more details, see Pub. 504.
+    </p>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line12Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">12. Business income or (loss). Attach Schedule C or C-EZ </span>
+      <input type="text" ng-model="f1040.line12" class="form-control incomeCalc" name="f1040line12" id="f1040line12">
+    </div>
+    <div id="f1040line12Info" class="collapse well well-sm">
+    <p>
+    	The value is generated by the Tax Calculator. It pulls the value from Schedule C, line 31. However, Schedule C is
+    	still under construction, so use with caution.
+    </p>
+    <p>
+    	If you operated a business or practiced your profession as a sole proprietor, report 
+    	your income and expenses on Schedule C or C-EZ.
+    </p>
+    <p>
+    	TODO: Need to finish implementation for Schedule C Parts 3 and 4.
+    </p>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line13Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">13. Capital gain or (loss). Attach Schedule D if required. If not required, check here </span>
+      <input type="text" ng-model="f1040.line13" class="form-control incomeCalc" name="f1040line13" id="f1040line13">
+    </div>
+    <div id="f1040line13Info" class="collapse well well-sm">
+    <p>
+    	From the IRS:<br>
+    	If you sold a capital asset, such as a stock or bond, you must complete and attach Form 8949 and Schedule D.
+    	<br><br>
+		Exception 1. You do not have to file Form 8949 or Schedule D if both of the following apply.
+		<ol>
+		<li> You have no capital losses, and your only capital gains are capital gain distributions 
+		from Form(s) 1099-DIV, box 2a (or substitute statements). </li>
+		<li> None of the Form(s) 1099-DIV (or substitute statements) have an amount in box 2b 
+		(unrecaptured section 1250 gain), box 2c (section 1202 gain), or box 2d (collectibles (28%) gain). </li>
+    	</ol>
+    	<br>
+    	Exception 2. You must file Schedule D, but generally do not have to file Form 8949, if Exception 1
+    	does not apply and your only capital gains and losses are:
+    	<ul>
+		<li> Capital gain distributions, </li>
+		<li> A capital loss carryover from 2013, A gain from Form 2439 or 6252 or
+		Part I of Form 4797, </li>
+		<li> A gain or loss from Form 4684, 6781, or 8824, <li>
+		<li> A gain or loss from a partnership, S corporation, estate, or trust, or <li>
+		<li> Gains and losses from transactions for which you received a Form 1099-B (or substitute statement) 
+		that shows basis was reported to the IRS and for which you do not need to make any adjustments 
+		in column (g) of Form 8949 or enter any codes in column (f) of Form 8949. </li>
+    	</ul>
+    	<br>
+    	If Exception 1 applies, enter your to- tal capital gain distributions (from box 2a of Form(s) 1099-DIV) 
+    	on line 13 and check the box on that line. If you received capital gain distributions as a nominee 
+    	(that is, they were paid to you but actually belong to someone else), report on line 13 only the amount 
+    	that belongs to you. Include a statement showing the full amount you received and the amount you 
+    	received as a nominee. See the Schedule B instructions for filing re- quirements for Forms 1099-DIV and 1096.
+    </p>
+    <p>
+    	TODO: Need to add checkbox and Schedule D form handling here. For now, enter value manually.
+    </p>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line14Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">14. Other gains or (losses). Attach Form 4797 </span>
+      <input type="text" ng-model="f1040.line14" class="form-control incomeCalc" name="f1040line14" id="f1040line14">
+    </div>
+    <div id="f1040line14Info" class="collapse well well-sm">
+    <p>
+    	Note yet implemented. Need to add Form 4797 form handling here. For now, enter value manually.
+    </p>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fdRow">
+      <span class="input-group-addon" title="You should receive a Form 1099-R
+showing the total amount of any distribution from your IRA before income tax
+or other deductions were withheld. This amount should be shown in box 1 of
+Form 1099-R. Unless otherwise noted in the line 15a and 15b instructions, an
+IRA includes a traditional IRA, Roth IRA, simplified employee pension(SEP) IRA, and a savings incentive
+match plan for employees (SIMPLE)IRA. Except as provided next, leave
+line 15a blank and enter the total distri-bution (from Form 1099-R, box 1) on
+line 15b.">15a. IRA distributions </span>
+      <input type="text" ng-model="f1040.line15a" class="form-control" name="f1040line15a" id="f1040line15a">
+      
+      <span class="input-group-addon">15b. Taxable amount </span>
+      <input type="text" ng-model="f1040.line15b" class="form-control incomeCalc" name="f1040line15b" id="f1040line15b">
+      
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fdRow">
+      <span class="input-group-addon" title="You should receive a Form 1099-R
+showing the total amount of your pension and annuity payments before income tax or other deductions were withheld. 
+This amount should be shown in box 1 of Form 1099-R. Pension and annuity payments include distributions
+from 401(k), 403(b), and governmental 457(b) plans. Rollovers and lump-sum
+distributions are explained later. Do not include the following payments on lines
+16a and 16b. Instead, report them online 7.
+
+Disability pensions received before you reach the minimum retirement age set by your employer.
+Corrective distributions (including any earnings) of excess salary deferrals or excess contributions to retirement
+plans. The plan must advise you of the year(s) the distributions are includible in
+income">16a. Pensions and annuities </span>
+      <input type="text" ng-model="f1040.line16a" class="form-control" name="f1040line16a" id="f1040line16a">
+      
+      <span class="input-group-addon">16b. Taxable amount </span>
+      <input type="text" ng-model="f1040.line16b" class="form-control incomeCalc" name="f1040line16b" id="f1040line16b">
+      
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line17Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">17. Rental real estate, royalties, partnerships, S corporations, trusts, etc. Attach Schedule E </span>
+      <input type="text" ng-model="f1040.line17" class="form-control incomeCalc" name="f1040line17" id="f1040line17">
+    </div>
+    <div id="f1040line17Info" class="collapse well well-sm">
+    <p>
+    	Not yet implemented. Need to add Schedule E form handling here. For now, enter value manually.
+    </p>
+    </div>	
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+    <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line18Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">18. Farm income or (loss). Attach Schedule F </span>
+      <input type="text" ng-model="f1040.line18" class="form-control incomeCalc" name="f1040line18" id="f1040line18">
+    </div>
+    <div id="f1040line18Info" class="collapse well well-sm">
+    <p>
+    	Not yet implemented. Need to add Schedule F form handling here. For now, enter value manually.
+    </p>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line19Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">19. Unemployment compensation </span>
+      <input type="text" ng-model="f1040.line19" class="form-control incomeCalc" name="f1040line19" id="f1040line19" readonly>
+    </div>
+    <div id="f1040line19Info" class="collapse well well-sm">
+    <p>
+    	The value is generated by the Tax Calculator. It sums all box 1 values from your 1099-Gs.
+    </p>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fdRow">
+      <span class="input-group-addon">20a. Social security benefits </span>
+      <input type="text" ng-model="f1040.line20a" class="form-control" name="f1040line20a" id="f1040line20a">
+      
+      <span class="input-group-addon">20b. Taxable amount </span>
+      <input type="text" ng-model="f1040.line20b" class="form-control" name="f1040line20b incomeCalc" id="f1040line20b">
+      
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fdRow">
+      <span class="input-group-addon">21. Other income. List type </span>
+      <input type="text" placeholder="Other income type" class="form-control" name="f1040line21type" id="f1040line21type">
+      
+      <span class="input-group-addon">and amount </span>
+      <input type="text" ng-model="f1040.line21" placeholder="Other income amount" class="form-control incomeCalc" name="f1040line21" id="f1040line21">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line22Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">22. Combine amounts in the right column, lines 7 through 21. This is your total income </span>
+      <input type="text" ng-model="f1040.line22" class="form-control" name="f1040line22" id="f1040line22" readonly>
+    </div>
+    <div id="f1040line22Info" class="collapse well well-sm">
+    <p>
+    	The value is generated by the Tax Calculator. It sums all values in the right column.<br>
+    	** I am pretty sure the instructions are wrong, they want to include 8a, not 8b in this calculations.
+    </p>
+    </div>
+    <br>
+    
+    <h3> Adjusted Gross Income </h3>
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">23. Educator expenses</span>
+      <input type="text" ng-model="f1040.line23" class="form-control incomeCalc" name="f1040line23" id="f1040line23">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon" style="white-space: normal;">24. Certain business expenses of reservists, performing artists, and
+fee-basis government officials. Attach Form 2106 or 2106-EZ</span>
+      <input type="text" ng-model="f1040.line24" class="form-control incomeCalc" name="f1040line24" id="f1040line24">
+    </div>
+    <br>
+    
+	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">25. Health savings account deduction. Attach Form 8889</span>
+      <input type="text" ng-model="f1040.line25" class="form-control incomeCalc" name="f1040line25" id="f1040line25">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">26. Moving expenses. Attach Form 3903</span>
+      <input type="text" ng-model="f1040.line26" class="form-control incomeCalc" name="f1040line26" id="f1040line26">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">27. Deductible part of self-employment tax. Attach Schedule SE</span>
+      <input type="text" ng-model="f1040.line27" class="form-control incomeCalc" name="f1040line27" id="f1040line27">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">28. Self-employed SEP, SIMPLE, and qualified plans</span>
+      <input type="text" ng-model="f1040.line28" aria-label="Amount" class="form-control incomeCalc" name="f1040line28" id="f1040line28">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">29. Self-employed health insurance deduction</span>
+      <input type="text" ng-model="f1040.line29" aria-label="Amount" class="form-control incomeCalc" name="f1040line29" id="f1040line29">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">30. Penalty on early withdrawal of savings </span>
+      <input type="text" ng-model="f1040.line30" aria-label="Amount" class="form-control incomeCalc" name="f1040line30" id="f1040line30">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">31a. Alimony paid </span>
+      <input type="text" ng-model="f1040.line31a" aria-label="Amount" class="form-control incomeCalc" name="f1040line31a" id="f1040line31a">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">32. IRA deduction </span>
+      <input type="text" ng-model="f1040.line32" aria-label="Amount" class="form-control incomeCalc" name="f1040line32" id="f1040line32">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">33. Student loan interest deduction </span>
+      <input type="text" ng-model="f1040.line33" aria-label="Amount" class="form-control incomeCalc" name="f1040line33" id="f1040line33">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">34. Tuition and fees. Attach Form 8917 </span>
+      <input type="text" ng-model="f1040.line34" aria-label="Amount" class="form-control incomeCalc" name="f1040line34" id="f1040line34">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">35. Domestic production activities deduction. Attach Form 890  </span>
+      <input type="text" ng-model="f1040.line35" aria-label="Amount" class="form-control incomeCalc" name="f1040line35" id="f1040line35">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">36. Add lines 23 through 35 </span>
+      <input type="text" ng-model="f1040.line36" aria-label="Amount" class="form-control incomeCalc" name="f1040line36" id="f1040line36" readonly>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">37. Subtract line 36 from line 22. This is your adjusted gross income </span>
+      <input type="text" ng-model="f1040.line37" aria-label="Amount" class="form-control incomeCalc" name="f1040line37" id="f1040line37" readonly>
+    </div>
+    <br>
+    
+    <h3> Tax and Credits </h3>
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">38. Amount from line 37 (adjusted gross income) </span>
+      <input type="text" ng-model="f1040.line38" aria-label="Amount" class="form-control incomeCalc" name="f1040line38" id="f1040line38" readonly>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fdRow" style="height: 80px">
+      <span class="input-group-addon" style="width: 60px;height: 80px ! important; text-align: top">39a. Check if: </span>
+      <div class="row form-control incomeCalc" style="height: 80px">
+      <div class="col-md-10">
+      <div class="checkbox-inline">
+      <label>
+    	 <input type="checkbox" class="f104039a" value="">
+    	 You were born before January 2, 1950, 
+  	  </label>   
+      </div><br>
+      <div class="checkbox-inline">
+      <label>
+    	 <input type="checkbox" class="f104039a" value="">
+    	 Spouse was born before January 2, 1950, 
+  	  </label>   
+      </div>
+      </div><div class="col-md-2">
+      <div class="checkbox-inline">
+      <label>
+    	 <input type="checkbox" class="f104039a" value="">
+    	 Blind  
+  	  </label>   
+      </div><br>
+      <div class="checkbox-inline">
+      <label>
+    	 <input type="checkbox" class="f104039a" value="">
+    	 Blind  
+  	  </label>   
+      </div>
+      </div></div>
+      <span class="input-group-addon" style="width: 80px;height: 80px; text-align: top">39a. Total boxes checked </span>
+      <input type="text" ng-model="f1040.line39a" class="form-control incomeCalc" name="f1040line39a" id="f1040line39a" readonly>
+    </div>
+    <br>
+    
+	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">39b. If your spouse itemizes on a separate return or you were a dual-status alien,  check here</span>
+      <input type="checkbox" style="width: 30px;" ng-model="f1040.line39b" class="form-control incomeCalc pull-left" name="f1040line39b" id="f1040line39b">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#f1040line40Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">40. Itemized deductions (from Schedule A) or your standard deduction (see left margin) </span>
+      <input type="text" ng-model="f1040.line40" class="form-control incomeCalc" name="f1040line40" id="f1040line40">
+    </div>
+    <div id="f1040line40Info" class="collapse well well-sm">
+    <p>
+    	Standard  Deduction  for: 
+    	<ul>
+    	<li>People who check any  box on line 39a or 39b or who can be claimed as a  
+		dependent, see instructions. </li>
+		<li>All others: Single or Married filing separately, $6,200 Married filing  
+		jointly or Qualifying widow(er), $12,400 Head of household, $9,100 </li>
+		</ul>
+	</p>
+	</div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">41. Subtract line 40 from line 38 </span>
+      <input type="text" ng-model="f1040.line41" class="form-control incomeCalc" name="f1040line41" id="f1040line41" readonly>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">42. Exemptions. If line 38 is $152,525 or less, multiply $3,950 by line 6d. Otherwise, see instructions </span>
+      <input type="text" ng-model="f1040.line42" class="form-control incomeCalc" name="f1040line42" id="f1040line42">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">43. Taxable income. Subtract line 42 from line 41. If line 42 is more than line 41, enter -0- </span>
+      <input type="text" ng-model="f1040.line43" class="form-control incomeCalc" name="f1040line43" id="f1040line43">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">44. Tax (see instructions). </span>
+      <input type="text" ng-model="f1040.line44" class="form-control incomeCalc" name="f1040line44" id="f1040line44">
+      <div class="input-group-btn" ng-model="overrides['form1040.line44']">
+                <button class="btn btn-default" ng-hide="overrides['form1040.line44']" 
+                type="button" onclick="overrideValue('form1040.line44', this);" data-toggle="tooltip" data-placement="top" 
+                title="Replace this value with one from the tax table">
+                <i class="glyphicon glyphicon-search"></i></button>
+                <button class="btn btn-default"  ng-show="overrides['form1040.line44']" type="button" 
+                onclick="removeOverride('form1040.line44', this);" data-toggle="tooltip" data-placement="top" 
+                title="Remove value override">
+                <i class="glyphicon glyphicon-remove"></i></button>
+    	</div>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">45. Alternative minimum tax (see instructions). Attach Form 6251. </span>
+      <input type="text" ng-model="f1040.line45" class="form-control incomeCalc" name="f1040line45" id="f1040line45">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">46. Excess advance premium tax credit repayment. Attach Form 8962 </span>
+      <input type="text" ng-model="f1040.line46" class="form-control incomeCalc" name="f1040line46" id="f1040line46">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">47. Add lines 44, 45, and 46 </span>
+      <input type="text" ng-model="f1040.line47" aria-label="Amount" class="form-control incomeCalc" name="f1040line47" id="f1040line47" readonly>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">48. Foreign tax credit. Attach Form 1116 if required </span>
+      <input type="text" ng-model="f1040.line48" aria-label="Amount" class="form-control incomeCalc" name="f1040line48" id="f1040line48">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">49. Credit for child and dependent care expenses. Attach Form 2441 </span>
+      <input type="text" ng-model="f1040.line49" aria-label="Amount" class="form-control incomeCalc" name="f1040line49" id="f1040line49">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">50. Education credits from Form 8863, line 19 </span>
+      <input type="text" ng-model="f1040.line50" aria-label="Amount" class="form-control incomeCalc" name="f1040line50" id="f1040line50">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">51. Retirement savings contributions credit. Attach Form 8880 </span>
+      <input type="text" ng-model="f1040.line51" aria-label="Amount" class="form-control incomeCalc" name="f1040line51" id="f1040line51">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">52. Child tax credit. Attach Schedule 8812, if required </span>
+      <input type="text" ng-model="f1040.line52" aria-label="Amount" class="form-control incomeCalc" name="f1040line52" id="f1040line52">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">53. Residential energy credits. Attach Form 5695 </span>
+      <input type="text" ng-model="f1040.line53" aria-label="Amount" class="form-control incomeCalc" name="f1040line53" id="f1040line53">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">54. Other credits from Form: </span>
+      <input type="text" ng-model="f1040.line54" aria-label="Amount" class="form-control incomeCalc" name="f1040line54" id="f1040line54">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">55. Add lines 48 through 54. These are your total credits </span>
+      <input type="text" ng-model="f1040.line55" aria-label="Amount" class="form-control incomeCalc" name="f1040line55" id="f1040line55" readonly>
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">56. Subtract line 55 from line 47. If line 55 is more than line 47, enter -0- </span>
+      <input type="text" ng-model="f1040.line56" aria-label="Amount" class="form-control incomeCalc" name="f1040line56" id="f1040line56" readonly>
+    </div>
+    <br>
+    
+    <h3> Other Taxes </h3>
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">57. Self-employment tax. Attach Schedule SE </span>
+      <input type="text" ng-model="f1040.line57" aria-label="Amount" class="form-control incomeCalc" name="f1040line57" id="f1040line57">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">58. Unreported social security and Medicare tax from Form: </span>
+      <input type="text" ng-model="f1040.line58" aria-label="Amount" class="form-control incomeCalc" name="f1040line58" id="f1040line58">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">59. Additional tax on IRAs, other qualified retirement plans, etc. Attach Form 5329 if required </span>
+      <input type="text" ng-model="f1040.line59" aria-label="Amount" class="form-control incomeCalc" name="f1040line59" id="f1040line59">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">60a. Household employment taxes from Schedule H </span>
+      <input type="text" ng-model="f1040.line60a" aria-label="Amount" class="form-control incomeCalc" name="f1040line60a" id="f1040line60a">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">60b First-time homebuyer credit repayment. Attach Form 5405 if required </span>
+      <input type="text" ng-model="f1040.line60b" aria-label="Amount" class="form-control incomeCalc" name="f1040line60b" id="f1040line60b">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">61. Health care: individual responsibility (see instructions) </span>
+      <input type="text" ng-model="f1040.line61" aria-label="Amount" class="form-control incomeCalc" name="f1040line61" id="f1040line61">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">62. Taxes from: </span>
+      <input type="text" ng-model="f1040.line62" class="form-control incomeCalc" name="f1040line62" id="f1040line62">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">63. Add lines 56 through 62. This is your total tax </span>
+      <input type="text" ng-model="f1040.line63" class="form-control incomeCalc" name="f1040line63" id="f1040line63" readonly>
+    </div>
+    <br>
+    
+    <h3> Payments </h3>
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">64. Federal income tax withheld from Forms W-2 and 1099 </span>
+      <input type="text" ng-model="f1040.line64" class="form-control incomeCalc" name="f1040line64" id="f1040line64">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">65. 2014 estimated tax payments and amount applied from 2013 return </span>
+      <input type="text" ng-model="f1040.line65" class="form-control incomeCalc" name="f1040line65" id="f1040line65">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">66a. Earned income credit (EIC) </span>
+      <input type="text" ng-model="f1040.line66a" class="form-control incomeCalc" name="f1040line66a" id="f1040line66a">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">66b. Nontaxable combat pay election </span>
+      <input type="text" ng-model="f1040.line66b" class="form-control incomeCalc" name="f1040line66b" id="f1040line66b">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">67. Additional child tax credit. Attach Schedule 8812 </span>
+      <input type="text" ng-model="f1040.line67" class="form-control incomeCalc" name="f1040line67" id="f1040line67">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">68. American opportunity credit from Form 8863, line 8 </span>
+      <input type="text" ng-model="f1040.line68" class="form-control incomeCalc" name="f1040line68" id="f1040line68">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">69. Net premium tax credit. Attach Form 8962 </span>
+      <input type="text" ng-model="f1040.line69" class="form-control incomeCalc" name="f1040line69" id="f1040line69">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">70. Amount paid with request for extension to file </span>
+      <input type="text" ng-model="f1040.line70" class="form-control incomeCalc" name="f1040line70" id="f1040line70">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">71. Excess social security and tier 1 RRTA tax withheld </span>
+      <input type="text" ng-model="f1040.line71" class="form-control incomeCalc" name="f1040line71" id="f1040line71">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">72. Credit for federal tax on fuels. Attach Form 4136 </span>
+      <input type="text" ng-model="f1040.line72" class="form-control incomeCalc" name="f1040line72" id="f1040line72">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">73. Credits from Form: </span>
+      <input type="text" ng-model="f1040.line73" class="form-control incomeCalc" name="f1040line73" id="f1040line73">
+    </div>
+    <br>
+    
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">74. Add lines 64, 65, 66a, and 67 through 73. These are your total payments </span>
+      <input type="text" ng-model="f1040.line74" class="form-control incomeCalc" name="f1040line74" id="f1040line74">
+    </div>
+    <br>
+    
+    <h3> Refund </h3>
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">75. If line 74 is more than line 63, subtract line 63 from line 74. This is the amount you overpaid </span>
+      <input type="text" ng-model="f1040.line75" class="form-control incomeCalc" name="f1040line75" id="f1040line75" readonly>
+    </div>
+    <br>
+    
+    <h3> Amount You Owe </h3>
+    <div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">78. Amount you owe. Subtract line 74 from line 63. For details on how to pay, see instructions </span>
+      <input type="text" ng-model="f1040.line78" class="form-control incomeCalc" name="f1040line78" id="f1040line78" readonly>
+    </div>
+    <br>
+    
+    <div class="input-group">
+        <button class="btn" type="submit" value="add">update Form 1040</button>
+    </div>
+    
+    </form>
+    
+    </div> <!-- end collapseform1040 -->
+    </div> <!-- end f1040 tabpanel -->
+    
+    <div role="tabpanel" class="tab-pane" id="f8962">
+    <h3>Form 8962</h3>
+    <form ng-repeat="f8962 in form8962" ng-model="f8962" ng-submit="formUpdate8962(form8962, 0 , true)"
+    class="form-horizontal" role="form" id="form8962">
+    <h3> Part 1: Annual and Monthly Contribution Amount </h3>
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">1. Family Size: Enter the number of exemptions from Form 1040 or Form 1040A, line 6d, or Form 1040NR, line 7d  </span>
+      <input type="text" ng-model="f8962.line1" class="form-control" name="f8962line1" id="f8962line1">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">2a. Modified AGI: Enter your modified AGI (see instructions)  </span>
+      <input type="text" ng-model="f8962.line2a" class="form-control" name="f8962line2a" id="f8962line2a">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">2b.  Enter total of your dependents' modified AGI (see instructions)   </span>
+      <input type="text" ng-model="f8962.line2b" class="form-control" name="f8962line2b" id="f8962line2b">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">3.  Household Income: Add the amounts on lines 2a and 2b  </span>
+      <input type="text" ng-model="f8962.line3" class="form-control" name="f8962line3" id="f8962line3">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">4. Federal Poverty Line: Enter the federal poverty amount as determined by the family size on line
+1 and the federal poverty table for your state of residence during the tax year (see instructions).   </span>
+      <input type="text" ng-model="f8962.line4" class="form-control" name="f8962line4" id="f8962line4">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">5. Household Income as a Percentage of Federal Poverty Line: Divide line 3 by line 4. Enter the result rounded to a whole percentage.   </span>
+      <input type="text" ng-model="f8962.line5" class="form-control" name="f8962line5" id="f8962line5">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">6. Is the result entered on line 5 less than or equal to 400%?   </span>
+      <input type="text" ng-model="f8962.line6" class="form-control" name="f8962line6" id="f8962line6">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">7. Applicable Figure: Using your line 5 percentage, locate your &#34;applicable figure&#34; on the table in the instructions </span>
+      <input type="text" ng-model="f8962.line7" class="form-control" name="f8962line7" id="f8962line7">
+      <div class="input-group-btn" ng-model="overrides['form8962.line7']">
+            <button class="btn btn-default" ng-hide="overrides['form8962.line7']" 
+            type="button" onclick="overrideValue('form8962.line7', this);" data-toggle="tooltip" data-placement="top" 
+                title="Replace this value with one from the form 8962 instruction table">
+            <i class="glyphicon glyphicon-search"></i></button>
+            <button class="btn btn-default"  ng-show="overrides['form8962.line7']" type="button" 
+            onclick="removeOverride('form8962.line7', this);" data-toggle="tooltip" data-placement="top" 
+                title="Remove this overide value">
+            <i class="glyphicon glyphicon-remove"></i></button>
+      </div>
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">8a. Annual Contribution for Health Care: Multiply line 3 by line 7  </span>
+      <input type="text" ng-model="f8962.line8a" class="form-control" name="f8962line8a" id="f8962line8a">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">8b. Monthly Contribution for Health Care: Divide line 8a by 12. Round to whole dollar amount </span>
+      <input type="text" ng-model="f8962.line8b" class="form-control" name="f8962line8b" id="f8962line8b">
+  	</div>
+  	<br>
+  	
+  	<div class="row">
+  		<div class="col-md-1 small">Annual Calculation </div>
+  		<div class="col-md-1 small">A. Premium Amount </div>
+  		<div class="col-md-1 small">B. Annual Premium </div>
+  		<div class="col-md-1 small">C. Monthly Contribution Amount </div>
+  		<div class="col-md-1 small">D. Annual Maximum Premium Assistance </div>
+  		<div class="col-md-1 small">E. Annual Premium Tax Credit Allowed </div>
+  		<div class="col-md-1 small">F. Monthly Advance Payment of PTC </div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">Annual Totals</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line11a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line11b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line11c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line11d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line11e"> </div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line11f"> </div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">Monthly Calculation </div>
+  		<div class="col-md-1 small">A. Monthly Premium Amount </div>
+  		<div class="col-md-1 small">B. Monthly Premium Amount of SLCSP</div>
+  		<div class="col-md-1 small">C. Monthly Contribution Amount </div>
+  		<div class="col-md-1 small">D. Monthly Maximum Premium Assistance </div>
+  		<div class="col-md-1 small">E. Monthly Premium Tax Credit Allowed </div>
+  		<div class="col-md-1 small">F. Monthly Advance Payment of PTC </div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">January</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line12a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line12b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line12c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line12d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line12e"> </div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line12f"> </div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">February</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line13a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line13b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line13c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line13d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line13e"> </div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line13f"> </div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">March</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line14a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line14b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line14c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line14d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line14e"> </div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line14f"> </div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">April</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line15a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line15b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line15c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line15d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line15e"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line15f"></div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">May</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line16a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line16b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line16c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line16d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line16e"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line16f"></div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">June</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line17a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line17b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line17c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line17d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line17e"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line17f"></div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">July</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line18a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line18b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line18c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line18d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line18e"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line18f"></div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">August</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line19a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line19b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line19c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line19d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line19e"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line19f"></div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">September</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line20a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line20b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line20c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line20d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line20e"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line20f"></div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">October</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line21a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line21b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line21c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line21d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line21e"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line21f"></div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">November</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line22a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line22b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line22c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line22d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line22e"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line22f"></div>
+  	</div>
+  	<div class="row">
+  		<div class="col-md-1 small">December</div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line23a"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line23b"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line23c"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line23d"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line23e"></div>
+  		<div class="col-md-1"><input type="text" ng-model="f8962.line23f"></div>
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">24. Total Premium Tax Credit: Enter the amount from line 11E or add lines 12E through 23E and enter the total here </span>
+      <input type="text" ng-model="f8962.line24" class="form-control" name="f8962line24" id="f8962line24">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">25. Advance Payment of PTC </span>
+      <input type="text" ng-model="f8962.line25" class="form-control" name="f8962line25" id="f8962line25">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">26. Net Premium Tax Credit </span>
+      <input type="text" ng-model="f8962.line26" class="form-control" name="f8962line26" id="f8962line26">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">27. Excess Advance Payment of PTC </span>
+      <input type="text" ng-model="f8962.line27" class="form-control" name="f8962line27" id="f8962line27">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group">
+        <button class="btn" type="submit" value="add">update Form 8962</button>
+    </div>
+  	
+    </form>
+    </div> <!-- end f8962 tabpanel -->
+    
+    <div role="tabpanel" class="tab-pane" id="schedSE">
+    <h2> Schedule SE </h2>
+    <form ng-repeat="schedSE in formSchedSE" ng-model="schedSE" ng-submit="updateSchedSE(schedSE, 0, true)"
+    class="form-horizontal" role="form" id="form1040">
+  	<h3> Section A - Short Schedule SE </h3>
+  	<div class="input-group input-group-sm fRow">
+  	  <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedSEline1aInfo" data-toggle="collapse"> </span>
+      <span class="input-group-addon">1a. Net farm profit or (loss)</span>
+      <input type="text" ng-model="schedSE.sectionA.line1a" class="form-control" name="schedSEline1a" id="schedSEline1a">
+  	</div>
+  	<div id="schedSEline1aInfo" class="collapse well well-sm">
+    <p>
+    	Net farm profit or (loss) from Schedule F, line 34, and farm partnerships, Schedule K-1 (Form 1065), box 14, code A
+    </p>
+    </div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+  	  <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedSEline1bInfo" data-toggle="collapse"> </span>
+      <span class="input-group-addon">1b. Conservation Reserve Program payments</span>
+      <input type="text" ng-model="schedSE.sectionA.line1b" class="form-control" name="schedSEline1b" id="schedSEline1b">
+  	</div>
+  	<div id="schedSEline1bInfo" class="collapse well well-sm">
+    <p>
+    	If you received social security retirement or disability benefits, enter the amount 
+		of Conservation Reserve Program payments included on Schedule F, line 4b, or listed on Schedule K-1 (Form 1065), box 20, code Z 
+    </p>
+    </div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+  	  <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedSEline2Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">2. Net profit or (loss) from Schedule C, line 31</span>
+      <input type="text" ng-model="schedSE.sectionA.line2" class="form-control" name="schedSEline2" id="schedSEline2">
+  	</div>
+  	<div id="schedSEline2Info" class="collapse well well-sm">
+    <p>
+    	From the IRS:<br>
+    	Net profit or (loss) from Schedule C, line 31; Schedule C-EZ, line 3; Schedule K-1 (Form 1065), box 14, code 
+		A (other than farming); and Schedule K-1 (Form 1065-B), box 9, code J1. Ministers and members 
+		of religious orders, see instructions for types of income to report on this line. See instructions for other income to report  
+    </p>
+    </div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+  	  <!-- <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedSEline3Info" data-toggle="collapse"> </span> -->
+      <span class="input-group-addon">3. Combine lines 1a, 1b, and 2 </span>
+      <input type="text" ng-model="schedSE.sectionA.line3" class="form-control" name="schedSEline3" id="schedSEline3">
+  	</div>
+  	<div id="schedSEline3Info" class="collapse well well-sm">
+    <p> 
+    </p>
+    </div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+  	  <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedSEline4Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">4. Multiply line 3 by 92.35% (.9235) </span>
+      <input type="text" ng-model="schedSE.sectionA.line4" class="form-control" name="schedSEline4" id="schedSEline4">
+  	</div>
+  	<div id="schedSEline4Info" class="collapse well well-sm">
+    <p>
+    	From the IRS:<br>
+    	Multiply line 3 by 92.35% (.9235). If less than $400, you do not owe self-employment 
+		tax; do not file this schedule unless you have an amount on line 1b
+		<br><br>
+    	TODO: implement this calculation  
+    </p>
+    </div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+  	  <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedSEline5Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">5. Self-employment tax. </span>
+      <input type="text" ng-model="schedSE.sectionA.line5" class="form-control" name="schedSEline5" id="schedSEline5">
+  	</div>
+  	<div id="schedSEline5Info" class="collapse well well-sm">
+    <p>
+    	From the IRS:<br>
+    	Self-employment tax. If the amount on line 4 is: 
+		<ul>
+			<li>$117,000 or less, multiply line 4 by 15.3% (.153). Enter the result here and 
+			on Form 1040, line 57, or Form 1040NR, line 55 </li>
+			<li>More than $117,000, multiply line 4 by 2.9% (.029). Then, add $14,508 to the result. Enter the total here and on 
+			Form 1040, line 57, or Form 1040NR, line 55 </li>
+			</ul>
+		<br><br>
+    	TODO: implement this calculation  
+    </p>
+    </div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+  	  <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedSEline6Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon">6. Deduction for one-half of self-employment tax </span>
+      <input type="text" ng-model="schedSE.sectionA.line6" class="form-control" name="schedSEline6" id="schedSEline6">
+  	</div>
+  	<div id="schedSEline6Info" class="collapse well well-sm">
+    <p>
+    	From the IRS:<br>
+    	Deduction for one-half of self-employment tax. Multiply line 5 by 50% (.50). Enter the 
+		result here and onForm 1040, line 27, or Form 1040NR, line 27 
+		<br><br>
+    	TODO: implement this calculation  
+    </p>
+    </div>
+  	<br>
+  	<i>Coming in the future: Section B - Long Schedule SE</i><br> See <a href="http://www.irs.gov/pub/irs-pdf/f1040sse.pdf"> Schedule SE </a>
+  	to determine if you need to fill out Section B. Hint: unless you were a minister, received 
+  	income from a church, or using "optional methods to determine your earnings" you probably don't need this.
+  	<br>
+  	<div class="input-group">
+        <button class="btn" type="submit" value="add">update Form Schedule SE</button>
+    </div>
+  	</form>
+  	</div> <!-- end schedSE tabpanel -->
+    
+    <div role="tabpanel" class="tab-pane" id="schedA">
+    <h2> Schedule A </h2>
+    
+    <form ng-repeat="schedA in formSchedA" ng-model="schedA" ng-submit="formUpdateSchedA(schedA, 0, true)"
+    class="form-horizontal" role="form" id="formSchedA">
+    <h3> Medical and Dental Expenses </h3>
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">1. Medical and dental expenses (see instructions) </span>
+      <input type="text" ng-model="schedA.line1" class="form-control" name="schedAline1" id="schedAline1">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">2. Enter amount from Form 1040, line 38 </span>
+      <input type="text" ng-model="schedA.line2" class="form-control" name="schedAline2" id="schedAline2" readonly>
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">3. Multiply line 2 by 10% (.10). But if either you or your spouse was born before January 2, 1950, multiply line 2 by 7.5% (.075) instead </span>
+      <input type="text" ng-model="schedA.line3" class="form-control" name="schedAline3" id="schedAline3" readonly>
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">4. Subtract line 3 from line 1. If line 3 is more than line 1, enter -0- </span>
+      <input type="text" ng-model="schedA.line4" class="form-control" name="schedAline4" id="schedAline4" readonly>
+  	</div>
+  	<br>
+  	
+  	<h3> Taxes You Paid </h3>
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">5. State and local (check only one box):</span>
+      <input type="text" ng-model="schedA.line5" class="form-control" name="schedAline5" id="schedAline5">
+  	</div>
+  	TODO: Add checkboxes
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">6. Real estate taxes (see instructions) </span>
+      <input type="text" ng-model="schedA.line6" class="form-control" name="schedAline6" id="schedAline6">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">7. Personal property taxes  </span>
+      <input type="text" ng-model="schedA.line7" class="form-control" name="schedAline7" id="schedAline7">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">8. Other taxes. List type and amount </span>
+      <input type="text" ng-model="schedA.line8" class="form-control" name="schedAline8" id="schedAline8">
+  	</div>
+  	TODO: Steal similar input from 1040
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">9. Add lines 5 through 8 </span>
+      <input type="text" ng-model="schedA.line9" class="form-control" name="schedAline9" id="schedAline9" readonly>
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+  	  <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedAline10info" data-toggle="collapse"> </span>
+      <span class="input-group-addon fRow">10. Home mortgage interest and points reported to you on Form 1098  </span>
+      <input type="text" ng-model="schedA.line10" class="form-control" name="schedAline10" id="schedAline10" readonly>
+  	</div>
+  	<div id="schedAline10info" class="collapse well well-sm">
+    <p>
+    	The Tax Calculator sums all 1098 box 1 and box2 to generate this number.
+    	From the IRS: <br>
+    	Enter on line 10 mortgage interest and points reported to you on Form 1098. If 
+		your  Form  1098  shows  any  refund  of overpaid interest, do not reduce your deduction 
+		by the refund. Instead, see the instructions  for  Form  1040,  line  21.  If 
+		you and at least one other person (other than your spouse if filing jointly) were 
+		liable for and paid interest on the mortgage,  and  the  interest  was  reported  on 
+		the  other  person's  Form  1098,  report your share of the interest on line 11 (as 
+		explained in the line 11 instructions). 
+		<br><br>
+		If you paid more interest to the recipient  
+		than  is  shown  on  Form  1098,  see Pub. 936 to find out if you can deduct the 
+		additional interest. If you can, attach a statement to your paper return explain-
+		ing the difference and enter “See attached” to the right of line 10.
+    </p>
+    <p>
+    	TODO: Need to finish implementation for Schedule C.
+    </p>
+    </div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+  	   <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedAline11info" data-toggle="collapse"> </span>
+      <span class="input-group-addon fRow">11. Home mortgage interest not reported to you on Form 1098.   </span>
+      <input type="text" ng-model="schedA.line11" class="form-control" name="schedAline11" id="schedAline11">
+  	</div>
+  	<div id="schedAline11info" class="collapse well well-sm">
+    <p>
+  		If paid to the person from whom you bought the home, see instructions and show that 
+  		person&#39;s name, identifying no., and address 
+  	</p>
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+  	  <span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedAline12Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon fRow">12. Points not reported to you on Form 1098. See instructions for special rules
+  </span>
+      <input type="text" ng-model="schedA.line12" class="form-control" name="schedAline12" id="schedAline12">
+  	</div>
+  	<div id="schedAline12Info" class="collapse well well-sm">
+  	<p>
+  		From the IRS:<br>
+  		Points  are  shown  on  your  settlement statement. Points you paid only to borrow  
+  		money  are  generally  deductible over the life of the loan. See Pub. 936 to 
+		figure  the  amount  you  can  deduct. Points paid for other purposes, such as 
+		for a lender's services, are not deductible.
+		<br><br>
+		Refinancing. <br>
+		Generally,  you  must  deduct points you paid to refinance a mortgage  over  the  life  of  
+		the  loan.  This  is true even if the new mortgage is secured by your main home.If  you  used  
+		part  of  the  proceeds  to improve your main home, you may be 
+		able to deduct the part of the points related to the improvement in the year paid. 
+		See Pub. 936 for details.
+	</p>
+	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">13. Mortgage insurance premiums (see instructions)  </span>
+      <input type="text" ng-model="schedA.line13" class="form-control" name="schedAline13" id="schedAline13">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">14. Investment interest. Attach Form 4952 if required. (See instructions.) </span>
+      <input type="text" ng-model="schedA.line14" class="form-control" name="schedAline14" id="schedAline14">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">15. Add lines 10 through 14  </span>
+      <input type="text" ng-model="schedA.line15" class="form-control" name="schedAline15" id="schedAline15" readonly>
+  	</div>
+  	<br>
+  	
+  	<h3> Gifts to Charity </h3>
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">16. Gifts by cash or check. If you made any gift of $250 or more, see instructions  </span>
+      <input type="text" ng-model="schedA.line16" class="form-control" name="schedAline16" id="schedAline16">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">17. Other than by cash or check. If any gift of $250 or more, see instructions. You 
+must attach Form 8283 if over $500 </span>
+      <input type="text" ng-model="schedA.line17" class="form-control" name="schedAline17" id="schedAline17">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">18. Carryover from prior year </span>
+      <input type="text" ng-model="schedA.line18" class="form-control" name="schedAline18" id="schedAline18">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">19. Add lines 16 through 18 </span>
+      <input type="text" ng-model="schedA.line19" class="form-control" name="schedAline19" id="schedAline19" readonly>
+  	</div>
+  	<br>
+  	
+  	<h3> Casualty and Theft Losses </h3>
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">20. Casualty or theft loss(es). Attach Form 4684. (See instructions.) </span>
+      <input type="text" ng-model="schedA.line20" class="form-control" name="schedAline20" id="schedAline20">
+  	</div>
+  	<br>
+  	
+  	<h3> Job Expenses and Certain Miscellaneous Deductions </h3>
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">21. Unreimbursed employee expenses—job travel, union dues, job education, etc. Attach Form 2106 or 2106-EZ if required. (See instructions.) </span>
+      <input type="text" ng-model="schedA.line21" class="form-control" name="schedAline21" id="schedAline21">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">22. Tax preparation fees </span>
+      <input type="text" ng-model="schedA.line22" class="form-control" name="schedAline22" id="schedAline22">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">23. Other expenses: investment, safe deposit box, etc. List type and amount  </span>
+      <input type="text" ng-model="schedA.line23" class="form-control" name="schedAline23" id="schedAline23">
+  	</div>
+  	TODO: Steal similar input from 1040
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">24. Add lines 21 through 23 </span>
+      <input type="text" ng-model="schedA.line24" class="form-control" name="schedAline24" id="schedAline24" readonly>
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">25. Enter amount from Form 1040, line 38 </span>
+      <input type="text" ng-model="schedA.line25" class="form-control" name="schedAline25" id="schedAline25" readonly>
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">26. Multiply line 25 by 2% (.02) </span>
+      <input type="text" ng-model="schedA.line26" class="form-control" name="schedAline26" id="schedAline26" readonly>
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">27. Subtract line 26 from line 24. If line 26 is more than line 24, enter -0- </span>
+      <input type="text" ng-model="schedA.line27" class="form-control" name="schedAline27" id="schedAline27" readonly>
+  	</div>
+  	<br>
+  	
+  	<h3> Other Miscellaneous Deductions </h3>
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">28. Other: from list in instructions. List type and amount  </span>
+      <input type="text" ng-model="schedA.line28" class="form-control" name="schedAline28" id="schedAline28">
+  	</div>
+  	TODO: Steal similar input from 1040
+  	<br>
+  	
+  	<h3> Total Itemized Deductions </h3>
+  	<div class="input-group input-group-sm fRow">
+  	<span class="input-group-addon finfo glyphicon glyphicon-info-sign" data-target="#schedAline29Info" data-toggle="collapse"> </span>
+      <span class="input-group-addon fRow">29. Is Form 1040, line 38, not over $152,525? Add lines 4, 9, 15, 19, 20, 27 and 28. </span>
+      <input type="text" ng-model="schedA.line29" class="form-control" name="schedAline29" id="schedAline29" readonly>
+  	</div>
+  	<div id="schedAline29Info" class="collapse well well-sm">
+  	<p>
+  		Is Form 1040, line 38, over $152,525?
+  	</p><p>
+  		No. Your deduction is not limited. Add the amounts in the far right column 
+		for lines 4 through 28. Also, enter this amount on Form 1040, line 40.
+	</p><p>
+		Yes. Your deduction may be limited. See the Itemized Deductions 
+		Worksheet in the instructions to figure the amount to enter.
+  	</p>
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">30. If you elect to itemize deductions even though they are less than your standard deduction, check here   </span>
+      <input type="text" ng-model="schedA.line30" class="form-control" name="schedAline30" id="schedAline30" readonly>
+  	</div>
+  	<br>
+  	
+  	<br>
+  	<div class="input-group">
+        <button class="btn" type="submit" value="add">update Form Schedule A</button>
+    </div>
+    
+    </form>
+    </div> <!-- end schedA tabpanel -->
+    
+    <div role="tabpanel" class="tab-pane" id="schedC">
+    <h2> Schedule C </h2>
+    
+    <form ng-repeat="schedC in formSchedC" ng-model="schedC" ng-submit="updateSchedC(schedC, 0, true)"
+    class="form-horizontal" role="form" id="formSchedC">
+  	<h3> Income </h3>
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon fRow">1. Gross receipts or sales. </span>
+      <input type="text" ng-model="schedC.line1" class="form-control" name="schedCline1" id="schedCline1">
+  	</div>
+  	<br>
+
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">2. Returns and allowances </span>
+      <input type="text" ng-model="schedC.line2" class="form-control" name="schedCline2" id="schedCline2">
+  	</div>
+  	<br>
+  
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">3. Subtract line 2 from line 1 </span>
+      <input type="text" ng-model="schedC.line3" class="form-control" name="schedCline3" id="schedCline3" readonly>
+  	</div>
+  	<br>  
+  	 
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">4. Cost of goods sold (from line 42) </span>
+      <input type="text" ng-model="schedC.line4" class="form-control" name="schedCline4" id="schedCline4">
+  	</div>
+  	<br>
+  
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">5. Gross profit. Subtract line 4 from line 3 </span>
+      <input type="text" ng-model="schedC.line5" class="form-control" name="schedCline5" id="schedCline5" readonly>
+  	</div>
+  	<br>
+  
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">6. Other income, including federal and state gasoline or fuel tax credit or refund (see instructions) </span>
+      <input type="text" ng-model="schedC.line6" class="form-control" name="schedCline6" id="schedCline6">
+  	</div>
+  	<br> 
+  
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">7. Gross income. Add lines 5 and 6  </span>
+      <input type="text" ng-model="schedC.line7" class="form-control" name="schedCline7" id="schedCline7" readonly>
+  	</div>
+  	<br>
+  
+  	<h3> Expenses </h3>
+  	<div class="row">
+  	<div class="col-md-6">
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">8. Advertising </span>
+      <input type="text" ng-model="schedC.line8" class="form-control" name="schedCline8" id="schedCline8">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">9. Car and truck expenses (see instructions) </span>
+      <input type="text" ng-model="schedC.line9" class="form-control" name="schedCline9" id="schedCline9">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">10. Commissions and fees </span>
+      <input type="text" ng-model="schedC.line10" class="form-control" name="schedCline10" id="schedCline10">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">11. Contract labor (see instructions) </span>
+      <input type="text" ng-model="schedC.line11" class="form-control" name="schedCline11" id="schedCline11">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">12. Depletion </span>
+      <input type="text" ng-model="schedC.line12" class="form-control" name="schedCline12" id="schedCline12">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">13. Depreciation and section 179 expense deduction (not included in Part III) </span>
+      <input type="text" ng-model="schedC.line13" class="form-control" name="schedCline13" id="schedCline13">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">14. Employee benefit programs(other than on line 19) </span>
+      <input type="text" ng-model="schedC.line14" class="form-control" name="schedCline14" id="schedCline14">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">15. Insurance (other than health) </span>
+      <input type="text" ng-model="schedC.line15" class="form-control" name="schedCline15" id="schedCline15">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">16. Interest </span>     
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">16a. Mortgage (paid to banks, etc.) </span>
+      <input type="text" ng-model="schedC.line16a" class="form-control" name="schedCline16a" id="schedCline16a">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">16b. Other </span>
+      <input type="text" ng-model="schedC.line16b" class="form-control" name="schedCline16b" id="schedCline16b">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">17. Legal and professional services </span>
+      <input type="text" ng-model="schedC.line17" class="form-control" name="schedCline17" id="schedCline17">
+  	</div>
+  	</div>
+  
+  	<div class="col-md-6">
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">18. Office expense (see instructions) </span>
+      <input type="text" ng-model="schedC.line18" class="form-control" name="schedCline18" id="schedCline18">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">19. Pension and profit-sharing plans </span>
+      <input type="text" ng-model="schedC.line19" class="form-control" name="schedCline19" id="schedCline19">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">20. Rent or lease (see instructions): </span>
+  	</div> 
+  
+  	<div class="input-group input-group-sm inputdcol fRow">   
+      <span class="input-group-addon">20a. Vehicles, machinery, and equipment </span>
+      <input type="text" ng-model="schedC.line20a" class="form-control" name="schedCline20a" id="schedCline20a">
+  	</div>
+   
+  	<div class="input-group input-group-sm inputdcol fRow"> 
+      <span class="input-group-addon">20b. Other business property </span>
+      <input type="text" ng-model="schedC.line20b" class="form-control" name="schedCline20b" id="schedCline20b">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow"> 
+      <span class="input-group-addon">21. Repairs and maintenance </span>
+      <input type="text" ng-model="schedC.line21" class="form-control" name="schedCline21" id="schedCline21">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">22. Supplies (not included in Part III </span>
+      <input type="text" ng-model="schedC.line22" class="form-control" name="schedCline22" id="schedCline22">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">23. Taxes and licenses </span>
+      <input type="text" ng-model="schedC.line23" class="form-control" name="schedCline23" id="schedCline23">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">24. Travel, meals, and entertainment: </span>
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">24a. Travel </span>
+      <input type="text" ng-model="schedC.line24a" class="form-control" name="schedCline24a" id="schedCline24a">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">24b. Deductible meals and entertainment (see instructions) </span>
+      <input type="text" ng-model="schedC.line24b" class="form-control" name="schedCline24b" id="schedCline24b">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">25. Utilities </span>
+      <input type="text" ng-model="schedC.line25" class="form-control" name="schedCline25" id="schedCline25">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">26. Wages (less employment credits) </span>
+      <input type="text" ng-model="schedC.line26" class="form-control" name="schedCline26" id="schedCline26">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon">27a. Other expenses (from line 48) </span>
+      <input type="text" ng-model="schedC.line27a" class="form-control" name="schedCline27a" id="schedCline27a">
+  	</div>
+  
+  	<div class="input-group input-group-sm inputdcol fRow">
+      <span class="input-group-addon"><b>b. Reserved for future use</b> </span>
+      <input type="text" ng-model="schedC.line27b" class="form-control" name="schedCline27b" id="schedCline27b" readonly>
+  	</div></div>
+  
+  	</div> <!-- end Expenses -->
+  	<br>
+  
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">28. Total Expenses before expenses for business use of home. Add lines 8 through 27a</span>
+      <input type="text" ng-model="schedC.line28" class="form-control" name="schedCline28" id="schedCline28" readonly>
+  	</div>
+  	<br>
+  
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">29. Tentative profit or (loss). Subtract line 28 from line 7 </span>
+      <input type="text" ng-model="schedC.line29" class="form-control" name="schedCline29" id="schedCline29" readonly>
+  	</div>
+  	<br>
+
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">30. Expenses for business use of your home. Do not report these expenses elsewhere. Attach Form 8829 unless using the simplified method (see instructions). </span>
+      <input type="text" ng-model="schedC.line30" class="form-control" name="schedCline30" id="schedCline30">
+  	</div>
+  	<br>
+  
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">31. Net profit or (loss). Subtract line 30 from line 29.  </span>
+      <input type="text" ng-model="schedC.line31" class="form-control" name="schedCline32" id="schedCline32" readonly>
+  	</div>
+  	<br>
+  	TODO: add line32 for losses<br>
+  	TODO: add Part III Cost of Goods Sold<br>
+  	TODO: add Part IV Information on Your Vehicle <br>
+  	<h3> Other Expenses </h3>
+  	List below business expenses not included on lines 8 through 26 - or line 30.
+  	<div class="row">
+  	<div class="col-md-8">
+  	<!-- <div class="input-group input-group-sm inputdcol fRow"> -->
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.desc1" class="form-control other-expense" name="schedCotherDesc1" 
+  		id="schedCotherDesc1" placeholder="Expense Description">
+  	</div>
+  	<br>
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.desc2" class="form-control other-expense" name="schedCotherDesc2" 
+  		id="schedCotherDesc2" placeholder="Expense Description">
+  	</div>	
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.desc3" class="form-control other-expense" name="schedCotherDesc3" 
+  		id="schedCotherDesc3" placeholder="Expense Description">
+  	</div>	
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.desc4" class="form-control other-expense" name="schedCotherDesc4" 
+  		id="schedCotherDesc4" placeholder="Expense Description">
+  	</div>	
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.desc5" class="form-control other-expense" name="schedCotherDesc5" 
+  		id="schedCotherDesc5" placeholder="Expense Description">
+  	</div>	
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.desc6" class="form-control other-expense" name="schedCotherDesc6" 
+  		id="schedCotherDesc6" placeholder="Expense Description">
+  	</div>	
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.desc7" class="form-control other-expense" name="schedCotherDesc7" 
+  		id="schedCotherDesc7" placeholder="Expense Description">
+  	</div>	
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.desc8" class="form-control other-expense" name="schedCotherDesc8" 
+  		id="schedCotherDesc8" placeholder="Expense Description">
+  	</div>	
+  	<br>
+
+  	</div>
+  	<div class="col-md-4">
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.amt1" class="form-control other-amount" name="schedCotherAmt1" 
+  		id="schedCotherAmt1" placeholder="Expense Amount">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.amt2" class="form-control other-amount" name="schedCotherAmt2" 
+  		id="schedCotherAmt2" placeholder="Expense Amount">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.amt3" class="form-control other-amount" name="schedCotherAmt3" 
+  		id="schedCotherAmt3" placeholder="Expense Amount">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.amt4" class="form-control other-amount" name="schedCotherAmt4" 
+  		id="schedCotherAmt4" placeholder="Expense Amount">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.amt5" class="form-control other-amount" name="schedCotherAmt5" 
+  		id="schedCotherAmt5" placeholder="Expense Amount">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.amt6" class="form-control other-amount" name="schedCotherAmt6" 
+  		id="schedCotherAmt6" placeholder="Expense Amount">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.amt7" class="form-control other-amount" name="schedCotherAmt7" 
+  		id="schedCotherAmt7" placeholder="Expense Amount">
+  	</div>
+  	<br>
+  	
+  	<div class="input-group input-group-sm">
+  		<input type="text" ng-model="schedC.otherExpenses.amt8" class="form-control other-amount" name="schedCotherAmt8" 
+  		id="schedCotherAmt8" placeholder="Expense Amount">
+  	</div>
+  	<br>
+  	
+  	</div>
+  	</div>
+  	<div class="input-group input-group-sm fRow">
+      <span class="input-group-addon">48. Total other expenses. Enter here and on line 27a </span>
+      <input type="text" ng-model="schedC.line48" class="form-control" name="schedCline48" id="schedCline48">
+  	</div>
+  	<br>
+  	<!-- end Other Expenses -->
+  	
+  	
+  	<br><br>
+  	<div class="input-group">
+        <button class="btn" type="submit" value="add">update Form Schedule C</button>
+    </div>
+  	
+  	</form>
+    </div> <!-- end schedC tabpanel -->
+  </div> <!-- end tabcontent -->
+  </div> <!-- end tabpanel -->
+  
+  <br>
+    <div class="input-group">
+        <button class="btn" type="submit" ng-click="saveAll()" value="save">Save All Data</button>
+  </div>
+  <br>
+  </div> <!-- end container -->
+  
+   <div style="display:none">
+  <div id="dialog-delete" title="Delete this tax form?"><p>You just indicated you wish to delete form.name from your list of fType's. 
+  Are you sure you want to do that?</div>
+  <div id="dialog-override" title="Manually entering data is hard work!">
+  	<span id="dialog-override-msg">The Tax Calculator hasn't gotten updated yet with the data you need from their various tables.
+  	You can override the lookup by entering the value here.</span>
+  	<form>
+  	<div class="input-group input-group-sm">
+      <span class="input-group-addon">Your override value  </span>
+      <input type="text" class="form-control" name="override" id="override">
+  	</div>
+  	</form>
+  </div>
+  </div>
+
+
+<script type="text/javascript">
+var taxCalcApp = angular.module('taxCalcApp', []);
+
+taxCalcApp.controller('TaxFormCtrl', function ($scope) {
+
+  $scope.form1040, $scope.w2s, $scope.form1099ints, $scope.form1099miscs = {};
+  $scope.form1099gs, $scope.overrides, $scope.form1098s = {};
+  $scope.formSchedA, $scope.formSchedC, $scope.formSchedSE, $scope.form8962 = {};
+  
+  $scope.loadAll = function(f1040, f8962, w2s, f1099gs, f1099ints, f1099miscs, f1098s, 
+      fSchedA, fSchedSE, fSchedC, overrides) {
+  	f1040 = JSON.parse(window.localStorage.getItem('form1040.02.2014'));
+  	if (!f1040) {
+  		f1040 = [{ 
+  		  'line1': '0', 'line2': '0', 'line3': '0', 'line4': '0', 'line5': '0', 'line6a': '0', 
+  		  'line6b': '0', 'line6c': '0', 'line6d': '0', 'line7': '0', 'line8a': '0', 
+  		  'line9a': '0', 'line10': '0', 'line11': '0', 'line12': '0', 'line13': '0', 'line14': '0', 
+  		  'line15b': '0', 'line16b': '0', 'line17': '0', 'line18': '0', 'line19': '0', 
+  		  'line20b': '0', 'line21': '0', 'line22': '0', 'line23': '0', 'line24': '0', 'line25': '0', 
+  		  'line26': '0', 'line27': '0', 'line28': '0', 'line29': '0', 'line30': '0',
+    	  'line31a': '0', 'line32': '0', 'line33': '0', 'line34': '0', 'line35': '0', 'line36': '0',
+    	  'line37': '0', 'line38': '0', 'line39a': '0', 'line39b': '0', 'line40': '0', 'line41': '0',
+    	  'line42': '0', 'line43': '0', 'line44': '0', 'line45': '0', 'line46': '0', 'line47': '0',
+    	  'line48': '0', 'line49': '0', 'line50': '0', 'line51': '0', 'line52': '0', 'line53': '0',
+    	  'line54': '0', 'line55': '0', 'line56': '0', 'line57': '0', 'line58': '0', 'line59': '0',
+    	  'line60a': '0', 'line60b': '0', 'line61': '0', 'line62': '0', 'line63': '0', 'line64': '0',
+    	  'line65': '0', 'line66a': '0', 'line66b': '0', 'line67': '0', 'line68': '0', 'line69': '0',
+    	  'line70': '0', 'line71': '0', 'line72': '0', 'line73': '0', 'line74': '0', 'line75': '0',
+    	  'line76': '0', 'line77': '0', 'line78': '0', 'line79': '0'
+    	}];
+    }
+    $scope.form1040 = f1040;
+    
+  	f8962 = JSON.parse(window.localStorage.getItem('form8962.02.2014'));
+  	if (!f8962) {
+  		f8962 = [{ 
+  		  'line1': '0', 'line2a': '0', 'line2b': '0', 'line3': '0', 'line4': '0', 'line5': '0', 
+  		  'line6': '0','line7': '0', 'line8a': '0', 'line8b': '0', 'line9a': '0', 'line10': '0', 
+    	  'line11a': '0', 'line11b': '0', 'line11c': '0', 'line11d': '0', 'line11e': '0', 'line11f': '0',
+    	  'line12a': '0', 'line12b': '0', 'line12c': '0', 'line12d': '0', 'line12e': '0', 'line12f': '0',
+    	  'line13a': '0', 'line13b': '0', 'line13c': '0', 'line13d': '0', 'line13e': '0', 'line13f': '0',
+    	  'line14a': '0', 'line14b': '0', 'line14c': '0', 'line14d': '0', 'line14e': '0', 'line14f': '0',
+    	  'line15a': '0', 'line15b': '0', 'line15c': '0', 'line15d': '0', 'line15e': '0', 'line15f': '0',
+    	  'line16a': '0', 'line16b': '0', 'line16c': '0', 'line16d': '0', 'line16e': '0', 'line16f': '0',
+    	  'line17a': '0', 'line17b': '0', 'line17c': '0', 'line17d': '0', 'line17e': '0', 'line17f': '0',
+    	  'line18a': '0', 'line18b': '0', 'line18c': '0', 'line18d': '0', 'line18e': '0', 'line18f': '0',
+    	  'line19a': '0', 'line19b': '0', 'line19c': '0', 'line19d': '0', 'line19e': '0', 'line19f': '0',
+    	  'line20a': '0', 'line20b': '0', 'line20c': '0', 'line20d': '0', 'line20e': '0', 'line20f': '0',
+    	  'line21a': '0', 'line21b': '0', 'line21c': '0', 'line21d': '0', 'line21e': '0', 'line21f': '0',
+    	  'line22a': '0', 'line22b': '0', 'line22c': '0', 'line22d': '0', 'line22e': '0', 'line22f': '0',
+    	  'line23a': '0', 'line23b': '0', 'line23c': '0', 'line23d': '0', 'line23e': '0', 'line23f': '0',
+    	  'line24': '0', 'line25': '0', 'line26': '0', 'line27': '0', 'line28': '0', 'line29': '0', 
+    	  'line30c': '0', 'line30d': '0', 'line30e': '0', 'line30f': '0', 'line30g': '0',
+    	  'line31c': '0', 'line31d': '0', 'line31e': '0', 'line31f': '0', 'line31g': '0',
+    	  'line32c': '0', 'line32d': '0', 'line32e': '0', 'line32f': '0', 'line32g': '0',
+    	  'line33c': '0', 'line33d': '0', 'line33e': '0', 'line33f': '0', 'line33g': '0',
+    	  'line34': '0', 'line35a': '0', 'line35b': '0', 'line35c': '0', 'line35d': '0',
+    	  'line36a': '0', 'line36b': '0', 'line36c': '0', 'line36d': '0',
+    	}];
+    }
+    $scope.form8962 = f8962;
+    
+    f1099gs = JSON.parse(window.localStorage.getItem('form1099gs.02.2014'));
+  	if (!f1099gs) {
+  		f1099gs = [{
+  		  'name': '', 'box1': '0', 'box2': '0', 'box3': '', 'box4': '', 'box5': '', 'box6': '', 
+  		  'box7': '', 'box8': '', 'box9': '', 'box10': '', 'box11': '' 
+  		}];
+  	}
+  	$scope.form1099gs = f1099gs;
+
+  	f1099ints = JSON.parse(window.localStorage.getItem('form1099ints.02.2014'));
+  	if (!f1099ints) {
+  		f1099ints = [{
+  		  'name': '', 'box1': '', 'box2': '', 'box3': '', 'box4': '', 'box5': '', 'box6': '', 
+  		  'box7': '', 'box8': '0', 'box9': '', 'box10': '', 'box11': '', 'box12': '', 
+  		  'box13': '', 'box4': '', 'box15': '' 
+    	}];
+  	}
+  	$scope.form1099ints = f1099ints;
+  	
+  	w2s = JSON.parse(window.localStorage.getItem('w2s.02.2014'));
+  	if (!w2s) {
+  		w2s = [{
+  		  'name': '', 'box1': '', 'box2': '', 'box3': '', 'box4': '', 'box5': '', 
+  		  'box6': '', 'box7': '', 'box8': '', 'box9': '', 'box10': '', 'box11': '', 'box12a': '', 
+    	  'box12b': '', 'box12c': '', 'box12d': '', 'box13': '', 'box14': '', 'box15': '', 
+    	  'box16': '', 'box17': '', 'box18': '', 'box19': '', 'box20': ''
+        }];
+    }
+    $scope.w2s = w2s;
+    
+    f1099miscs = JSON.parse(window.localStorage.getItem('form1099miscs.02.2014'));
+  	if (!f1099miscs) {
+    	f1099miscs = [{
+    	  'name': '', 'box1': '', 'box2': '', 'box3': '', 'box4': '', 'box5': '', 
+    	  'box6': '', 'box7': '', 'box8': '', 'box9': '', 'box10': '', 'box11': '', 
+    	  'box12': '', 'box13': '', 'box14': '', 'box15': '', 'box16': '', 'box17': '', 'box18': ''
+    	}];
+  	}
+  	$scope.form1099miscs = f1099miscs;
+  	
+  	f1098s = JSON.parse(window.localStorage.getItem('form1098s.02.2014'));
+  	if (!f1098s) {
+    	f1098s = [{
+    	  'name': '', 'box1': '', 'box2': '', 'box3': '', 'box4': '', 'box5': ''
+    	}];
+  	}
+  	$scope.form1098s = f1098s;
+  	
+  	fSchedA = JSON.parse(window.localStorage.getItem('formSchedA.02.2014'));
+  	if (!fSchedA) {
+  		fSchedA = [{
+  		  'line1': '0', 'line2': '0', 'line3': '0', 'line4': '0', 'line5': '0', 'line6': '0', 
+  		  'line7': '0', 'line8': '0', 'line9': '0', 'line10': '0', 'line11': '0', 'line12': '0',
+  		  'line13': '0', 'line14': '0', 'line15': '0', 'line16': '0', 'line17': '0', 
+  		  'line18': '0', 'line19': '0', 'line20': '0', 'line21': '0', 'line22': '0', 
+  		  'line23': '0', 'line24': '0', 'line25': '0', 'line26': '0', 'line27': '0', 
+  		  'line28': '0', 'line29': '0', 'line30': '0'
+    	}];
+  	}
+  	$scope.formSchedA = fSchedA;
+  	
+  	fSchedC = JSON.parse(window.localStorage.getItem('formSchedC.02.2014'));
+  	if (!fSchedC) {
+  		fSchedC = [{
+  		  'line1': '0', 'line2': '0', 'line3': '0', 'line4': '0', 
+  		  'line5': '0', 'line6': '0', 'line7': '0', 'line8': '0', 'line9': '0', 'line10': '0', 
+  		  'line11': '0', 'line12': '0','line13': '0', 'line14': '0', 'line15': '0', 
+  		  'line16a': '0', 'line16b': '0', 'line17': '0', 'line18': '0', 'line19': '0', 
+  		  'line20a': '0', 'line20b': '0', 'line21': '0', 'line22': '0', 'line23': '0', 
+  		  'line24a': '0', 'line24b': '0', 'line25': '0', 'line26': '0', 'line27a': '0',
+    	  'line27b': '0', 'line28': '0', 'line29': '0', 'line30': '0', 'line31': '0', 
+    	  'line48': '0', 'otherExpenses': {}
+    	}];
+  	}
+  	$scope.formSchedC = fSchedC;
+  	
+  	fSchedSE = JSON.parse(window.localStorage.getItem('formSchedSE.02.2014'));
+  	if (!fSchedSE || !fSchedSE.sectionA) {
+  		fSchedSE = [{
+  		  'sectionA': {
+  		    'line1a': '0', 'line1b': '0', 'line2': '0', 'line3': '0', 'line4': '0', 
+  		    'line5': '0', 'line6': '0'
+    	  },
+    	  'sectionB': {
+    	    'line1a': '0', 'line1b': '0', 'line2': '0', 'line3': '0', 'line4a': '0', 
+  		    'line4b': '0', 'line4c': '0', 'line5a': '0', 'line5b': '0', 'line6': '0', 'line7': '0', 
+  		    'line8a': '0', 'line8b': '0', 'line8c': '0', 'line8d': '0', 'line9': '0', 'line10': '0', 
+  		    'line11': '0', 'line12': '0','line13': '0', 'line14': '0', 'line15': '0', 
+  		    'line16a': '0', 'line16b': '0', 'line17': '0'
+    	}}];
+  	}
+  	$scope.formSchedSE = fSchedSE;
+  	
+  	overrides = JSON.parse(window.localStorage.getItem('overrides.02.2014'));
+  	if (!overrides) {
+  		overrides = {};
+  	}
+  	$scope.overrides = overrides;
+  
+  };
+  
+  $scope.loadAll($scope.form1040, $scope.form8962, $scope.w2s, $scope.form1099gs, $scope.form1099ints, 
+  	$scope.form1099miscs, $scope.form1098s, $scope.formSchedA, $scope.formSchedSE, $scope.formSchedC, $scope.overrides);
+  	
+  /* if Schedule C line 31 changes, then Schedule SE line 2 needs to be updated */
+  $scope.updateSchedSE = function (schedSE, line, propagate) {
+  	console.log('got in update Schedule SE');
+  	schedSE['sectionA'].line2 = $scope.formSchedC[0].line31;
+  	schedSE['sectionA'].line3 = (parseFloat(schedSE['sectionA'].line1a) + parseFloat(schedSE['sectionA'].line1b) + 
+  		parseFloat(schedSE['sectionA'].line2)).toFixed(2);
+  	schedSE['sectionA'].line4 = (schedSE['sectionA'].line3 * .9235).toFixed(2);
+  	if (schedSE['sectionA'].line4 < 117000) {
+  		schedSE['sectionA'].line5 = (schedSE['sectionA'].line4 * .153).toFixed(2);
+  	} else {
+  		schedSE['sectionA'].line5 = (schedSE['sectionA'].line4 * .029 + 14508).toFixed(2);
+  	}
+  	schedSE['sectionA'].line6 = (schedSE['sectionA'].line5 * .5).toFixed(2);
+  	if (propagate) $scope.update1040($scope.form1040[0], 12, true);
+  };
+  
+  /* If a Form 1099-MISC box 7 changes, then Schedule C line 1 and everything after needs to be updated.
+   * If a Schedule C, Section 5 value changes, then Schedule C line 27a and line 48 and everything after needs to be updated.
+   */
+  $scope.updateSchedC = function (schedC, line, propagate) {
+    console.log('updating schedule C');
+  	schedC.line1 = 0;
+  	for (i = 0; i <  $scope.form1099miscs.length; i++) {
+  		if($scope.form1099miscs[i].box7) schedC.line1 += parseFloat($scope.form1099miscs[i].box7);
+  	}
+  	
+  	schedC.line3 = schedC.line1 - schedC.line2;
+  	schedC.line5 = schedC.line3 - schedC.line4;
+  	schedC.line7 = parseFloat(schedC.line5) + parseFloat(schedC.line6);
+  	
+  	//Other Expenses
+  	var otherExpenses = parseFloat(0);
+  	$( '.other-amount' ).each(function( index ) {
+  		if ($( this ).val()) otherExpenses += parseFloat($( this ).val());
+	});
+	schedC.line48 = otherExpenses.toFixed(2);
+	schedC.line27a = schedC.line48;
+	
+  	schedC.line28 = parseFloat(schedC.line8) + parseFloat(schedC.line9) +
+  								parseFloat(schedC.line10) + parseFloat(schedC.line11) +
+  								parseFloat(schedC.line12) + parseFloat(schedC.line13) +
+  								parseFloat(schedC.line14) + parseFloat(schedC.line15) +
+  								parseFloat(schedC.line16a) + parseFloat(schedC.line16b) +
+  								parseFloat(schedC.line17) + parseFloat(schedC.line18) +
+  								parseFloat(schedC.line19) + parseFloat(schedC.line20a) +
+  								parseFloat(schedC.line20b) + parseFloat(schedC.line21) +
+  								parseFloat(schedC.line22) + parseFloat(schedC.line23) +
+  								parseFloat(schedC.line24a) + parseFloat(schedC.line24b) +
+  								parseFloat(schedC.line25) + parseFloat(schedC.line26) +
+  								parseFloat(schedC.line27a);
+  								
+  	schedC.line29 = (schedC.line7 - schedC.line28).toFixed(2);
+  	schedC.line31 = (schedC.line29 - schedC.line30).toFixed(2);
+  	$scope.updateSchedSE($scope.formSchedSE[0], 0, propagate);
+  	if (propagate) {
+  		$scope.update1040($scope.form1040[0], 12, true);
+  	}
+  };
+  
+  /* If a W2 box 1 changes, then 1040 line 7 and after need to be updated.
+   * If a Form 1099-INT box 1 or 8 changes, then 1040 line 8a or 8b and after needs to be updated.
+   * If a Form 1099-G box 1 or box 2 changes, then 1040 line 19 or 10 and after needs to be updated.
+   * If Schedule C line 31 changes, then 1040 line 12 and everything after needs to be updated. 
+   * If Schedule SE, Section A, line 6 changes, then 1040 line 27 and after needs to be updated.
+   * If Schedule A line 29 changes, then 1040 line 40 and after needs to be updated.
+   * If Schedule SE, Section A, line 5 changes, then 1040 line 57 and after need to be updated. f1040.line57 
+   * If a W2 box 2 changes, then 1040 line 64 and after need to be updated.
+   * If a Form 1099-G box 4 changes, then 1040 line 64 and after need to be updated.
+   * If a Form 1099-INT box 4 changes, then 1040 line 64 and after need to be updated.
+   * If a Form 1099-MISC box 4 changes, then 1040 line 64 and after need to be updated.
+   * TODO: add other 1099s here, 1099-div, 1099-sa
+   * If Form 8962 line 26 changes, then 1040 line 69 and after need to be updated.
+   */
+  $scope.update1040 = function (f1040, line, propagate) {
+	console.log('got in update 1040');
+	switch(line) {
+    case 0:
+    console.log('updating 1040 from line 0');
+  	f1040.line7 = 0;
+  	for (i = 0; i <  $scope.w2s.length; i++) {
+  		if($scope.w2s[i].box1) f1040.line7 += parseFloat($scope.w2s[i].box1);
+  	}
+  	
+  	f1040.line8a = 0;
+  	f1040.line8b = 0;
+  	for (i = 0; i <  $scope.form1099ints.length; i++) {
+  		if($scope.form1099ints[i].box1) f1040.line8a += parseFloat($scope.form1099ints[i].box1);
+  		if($scope.form1099ints[i].box8) f1040.line8b += parseFloat($scope.form1099ints[i].box8);
+  	}
+  	/*TODO: Line 8b should also include all 1099-DIV box10s */
+  	/*TODO: Line 9a should include all 1099-DIV box1as */
+  	/*TODO: If Line 8a or 9a is greater than $1500, a Schedule B is required */
+  	/*TODO: Line 9b should include all 1099-DIV box1bs */
+  	
+  	f1040.line10 = 0;
+  	f1040.line19 = 0;
+  	for (i = 0; i <  $scope.form1099gs.length; i++) {
+  		if($scope.form1099gs[i].box2) f1040.line10 += parseFloat($scope.form1099gs[i].box2);
+  		if($scope.form1099gs[i].box1) f1040.line19 += parseFloat($scope.form1099gs[i].box1);
+  	}
+  	
+  	$scope.updateSchedC($scope.formSchedC[0], 0, false);
+  	
+  	case 12:
+  	console.log('updating 1040 from line 12, f1040.line7: ' + f1040.line7);
+  	f1040.line12 = $scope.formSchedC[0].line31;
+  	
+  	f1040.line22 = 0;
+  	f1040.line22 = parseFloat(f1040.line7) + parseFloat(f1040.line8a) + parseFloat(f1040.line9a) + 
+  		parseFloat(f1040.line10) + parseFloat(f1040.line11) + parseFloat(f1040.line12) +
+  		parseFloat(f1040.line13) + parseFloat(f1040.line14) + parseFloat(f1040.line15b) + 
+  		parseFloat(f1040.line17) + parseFloat(f1040.line18) + parseFloat(f1040.line19) +
+  		parseFloat(f1040.line20b) + parseFloat(f1040.line21);
+  								
+  	f1040.line7 = (parseFloat(f1040.line7)).toFixed(2);
+  	f1040.line8a = (parseFloat(f1040.line8a)).toFixed(2);
+  	f1040.line8b = (parseFloat(f1040.line8b)).toFixed(2);
+  	f1040.line10 = (parseFloat(f1040.line10)).toFixed(2);
+  	f1040.line19 = (parseFloat(f1040.line19)).toFixed(2);
+  	f1040.line22 = (parseFloat(f1040.line22)).toFixed(2);
+  	
+  	f1040.line27 = (parseFloat($scope.formSchedSE[0].sectionA.line6)).toFixed(2);
+  	
+  	f1040.line36 = 0;
+  	f1040.line36 = parseFloat(f1040.line23) + parseFloat(f1040.line24) + 
+  		parseFloat(f1040.line25) + parseFloat(f1040.line26) + parseFloat(f1040.line27) +
+  		parseFloat(f1040.line28) + parseFloat(f1040.line29) + parseFloat(f1040.line30) +
+  		parseFloat(f1040.line31a) + parseFloat(f1040.line32) + parseFloat(f1040.line33) +
+  		parseFloat(f1040.line34) + parseFloat(f1040.line35);
+  		
+  	f1040.line37 = (f1040.line22 - f1040.line36).toFixed(2);
+  	f1040.line38  = f1040.line37;
+  	updateSchedA($scope.formSchedA[0], 2, false);
+  	
+  	case 40:
+  	console.log('updating from line 40');
+  	//for now, just use standard deduction, until Sched A interaction is figured out
+  	//Single or Married filing separately, $6,200 Married filing jointly or Qualifying widow(er), 
+  	//$12,400 Head of household, $9,100 
+  	var trueVal = new String('true').valueOf();
+  	if((new String(f1040.line1).valueOf() == trueVal) || (new String(f1040.line3).valueOf() == trueVal)) f1040.line40 = 6200;
+  	if((new String(f1040.line2).valueOf() == trueVal) || (new String(f1040.line5).valueOf() == trueVal)) f1040.line40 = 12400;
+  	if(new String(f1040.line4).valueOf() == trueVal) f1040.line40 = 9100;
+  	if($scope.formSchedA[0].line29 > f1040.line40) f1040.line40 = $scope.formSchedA[0].line29;
+  	
+  	f1040.line41  = f1040.line38 - f1040.line40;
+  	f1040.line41 = f1040.line41.toFixed(2);
+  	
+  	//If line 38 is $152,525 or less, multiply $3,950 by the number on line 6d. Otherwise, see instructions
+  	if (f1040.line38 <= 152525) f1040.line42 = f1040.line6d * 3950;
+  	else {
+  		alert('line 38 is more than $152,525, see instructions ' + f1040.line38);
+  		//TODO: add some logic to better handle this
+  	}
+  	
+  	f1040.line43 = f1040.line41 - f1040.line42;
+  	f1040.line43 = f1040.line43.toFixed(2);
+  	
+  	case 44:
+  	if ($scope.overrides['form1040.line44']) {
+  		f1040.line44 = $scope.overrides['form1040.line44'];
+  	} else if (new String(f1040.line1).valueOf() == trueVal) {
+  	 	//only have values for singles in tax table lookup right now
+  	 	console.log('looking up tax for line 44');
+  		f1040.line44 = taxTableLookup(f1040.line43, 'single', $scope.overrides);
+  	} else {
+  		f1040.line44 = -1;
+  	}
+  	if (f1040.line44 == -1) {
+  		$( '#f1040line44' ).parent().addClass('has-warning');
+  	} else {
+  		$( '#f1040line44' ).parent().removeClass('has-warning');
+  	}
+  	
+  	//47. Add lines 44, 45, and 46 
+  	f1040.line47 = parseFloat(f1040.line44) + parseFloat(f1040.line45) + parseFloat(f1040.line46);
+  	
+  	//55. Add lines 48 through 54. These are your total credits 
+  	f1040.line55 = parseFloat(f1040.line48) + parseFloat(f1040.line49) + parseFloat(f1040.line50) +
+  		parseFloat(f1040.line51) + parseFloat(f1040.line52) + parseFloat(f1040.line53) + parseFloat(f1040.line54);
+  	
+  	//56. Subtract line 55 from line 47. If line 55 is more than line 47, enter -0- 
+  	f1040.line56 = f1040.line47 - f1040.line55;
+  	
+  	case 57:
+  	f1040.line57 = $scope.formSchedSE[0].sectionA.line5;
+
+  	//63. Add lines 56 through 62. This is your total tax 
+  	f1040.line63 = (parseFloat(f1040.line56) + parseFloat(f1040.line57) + parseFloat(f1040.line58) +
+  		parseFloat(f1040.line59) + parseFloat(f1040.line60a) + parseFloat(f1040.line60b) + 
+  		parseFloat(f1040.line61) + parseFloat(f1040.line62)).toFixed(2);
+  		
+  	f1040.line64 = 0;
+  	for (i = 0; i <  $scope.w2s.length; i++) { if($scope.w2s[i].box2) f1040.line64 += parseFloat($scope.w2s[i].box2); }
+  	for (i = 0; i <  $scope.form1099gs.length; i++) { if($scope.form1099gs[i].box4) f1040.line64 += parseFloat($scope.form1099gs[i].box4); }
+  	for (i = 0; i <  $scope.form1099ints.length; i++) { if($scope.form1099ints[i].box4) f1040.line64 += parseFloat($scope.form1099ints[i].box4); }
+  	for (i = 0; i <  $scope.form1099miscs.length; i++) { if($scope.form1099miscs[i].box4) f1040.line64 += parseFloat($scope.form1099miscs[i].box4); }
+  	//TODO: add other 1099s here, 1099-div, 1099-sa
+  	
+  	update8962($scope.form8962, 0 , false);
+  	
+  	case 69:
+  	f1040.line69 = $scope.form8962[0].line26;
+
+  	//74. Add lines 64, 65, 66a, and 67 through 73. These are your total payments 
+  	f1040.line74 = f1040.line64 + parseFloat(f1040.line65) + parseFloat(f1040.line66a) +
+  		parseFloat(f1040.line67) + parseFloat(f1040.line68) + parseFloat(f1040.line69) + 
+  		parseFloat(f1040.line70) + parseFloat(f1040.line71) + parseFloat(f1040.line72) + 
+  		parseFloat(f1040.line73);
+  		
+  	f1040.line74 = f1040.line74.toFixed(2);
+  		
+  	//75. If line 74 is more than line 63, subtract line 63 from line 74. This is the amount you overpaid 	
+  	f1040.line75 = (f1040.line63 < f1040.line74) ? (f1040.line74 - f1040.line63).toFixed(2) : 0;
+  	f1040.line78 = (f1040.line63 > f1040.line74) ? (f1040.line63 - f1040.line74).toFixed(2) : 0;
+  	}
+
+  };
+  
+  //need to think about whether I really want to be doing this update here
+  $scope.update1040($scope.form1040[0], 0, false);
+  	
+  /* If Form 1040 line 6d changes, then 8962 line 1 and everything after needs to be updated.
+     If Form 1040 line 38 changes, then 8962 line 2a and everything after needs to be updated.
+  */
+  function update8962 (f8962, line, propagate) {
+  	console.log('updating form 8962');
+  	f8962[0].line1 = $scope.form1040[0].line6d;
+
+  	//for now, just taking the AGI from1040, eventually add the worksheet
+  	f8962[0].line2a = parseFloat($scope.form1040[0].line38).toFixed(2);
+  	f8962[0].line3 = parseFloat(f8962[0].line2a + parseFloat(f8962[0].line2b)).toFixed(2);
+  	f8962[0].line4 = povertyLineLookup(f8962[0].line1);
+  	
+  	//Divide the amount on line 3 by the amount on line 4 to figure your
+	//household income as a percentage of the Federal poverty line.
+  	f8962[0].line5 = (f8962[0].line3 / f8962[0].line4 * 100).toFixed(0);
+  	if ($scope.overrides['form8962.line7']) {
+  		f8962[0].line7 = $scope.overrides['form8962.line7'];
+  	} else {
+  		f8962[0].line7 = applicableFigureLookup(f8962[0].line5);
+  	}
+  	if (f8962[0].line7 == -1) {
+  		$( '#f8962line7' ).parent().addClass('has-warning');
+  	} else {
+  		$( '#f8962line7' ).parent().removeClass('has-warning');
+  	}
+  	
+  	f8962[0].line8a = (f8962[0].line7 * f8962[0].line3).toFixed(2);
+  	f8962[0].line8b = (f8962[0].line8a / 12).toFixed(2);
+  	
+  	//Total Premium Tax Credit: Enter the amount from line 11E or 
+  	//add lines 12E through 23E and enter the total here 
+  	//f8962[0].line24 = f8962[0].line11e;
+  	
+  	//TODO: need to decouple this
+  	f8962[0].line24 = (parseFloat(f8962[0].line12e) + parseFloat(f8962[0].line12e) + 
+  		parseFloat(f8962[0].line13e) + parseFloat(f8962[0].line14e) + parseFloat(f8962[0].line15e) +
+  		parseFloat(f8962[0].line16e) + parseFloat(f8962[0].line17e) + parseFloat(f8962[0].line18e) +
+  		parseFloat(f8962[0].line19e) + parseFloat(f8962[0].line20e) + parseFloat(f8962[0].line21e) +
+  		parseFloat(f8962[0].line22e) + parseFloat(f8962[0].line23e)).toFixed(2);
+  	//Advance Payment of PTC: Enter the amount from line 11F or 
+  	//add lines 12F through 23F and enter the total here 
+  	f8962[0].line25 = f8962[0].line11f;
+  	f8962[0].line11c = f8962[0].line8a;
+  	f8962[0].line11d = (parseFloat(f8962[0].line11b) - parseFloat(f8962[0].line11c)).toFixed(2);
+  	f8962[0].line11e = Math.min(f8962[0].line11a, f8962[0].line11d);
+  	
+  	/*Net Premium Tax Credit: If line 24 is greater than line 25, subtract
+	line 25 from line 24. Enter the difference here and on Form 1040, line 69; Form 1040A, 
+	line 45; or Form 1040NR, line 65. If you elected the alternative calculation for marriage, 
+	enter zero.	If line 24 equals line 25, enter zero. Stop here. If line 25 is greater than line 24, 
+	leave this line blank and continue to line 27 */
+	f8962[0].line26 = 0;
+	if (f8962[0].line24 > f8962[0].line25) f8962[0].line26 = (f8962[0].line24 - f8962[0].line25).toFixed(2);
+	
+	//Excess Advance Payment of PTC: If line 25 is greater than line 24, subtract 
+	//line 24 from line 25. Enter the difference here
+	f8962[0].line27 = 0;
+	if (f8962[0].line24 < f8962[0].line25) f8962[0].line27 = f8962[0].line25 - f8962[0].line24;
+	if(propagate) $scope.update1040($scope.form1040[0], 69, true); 
+  };
+
+  //make this accessible to the form
+  $scope.formUpdate8962 = function (f8962, line, propogate) {
+  	update8962(f8962, line, propogate);
+  }
+  
+  /* If Form 1040 line 38 changes, then Schedule A line 2 and after needs to be updated.
+   * If a Form 1098 box 1 or box 2 changes, then Schedule A line 10 and after needs to be updated.
+   * If Form 1040 line 38 changes, then Schedule A line 25 and after needs to be updated. (redundant)
+   * If Schedule A line 29 changes, then 1040 line 40 and after needs to be updated.
+   */
+  //$scope.updateSchedA = function (schedA, line, propagate) {
+  function updateSchedA (schedA, line, propagate) {
+    console.log('got in updateSchedA with line: ' + line + ' and propagate: ' + propagate);
+    switch(line) {
+    case 0:
+    case 2:
+  	schedA.line2 = $scope.form1040[0].line38;
+  	//Need to add: But if either you or your spouse was born before January 2, 1950, multiply line 2 by 7.5% (.075) instead 
+  	schedA.line3 = (schedA.line2 * .1).toFixed(2);
+  	schedA.line4 = ((schedA.line1 - schedA.line3) >= 0) ? (schedA.line1 - schedA.line3).toFixed(2) : 0;
+
+  	schedA.line9 = 0;
+  	if (schedA.line5) schedA.line9 += parseFloat(schedA.line5);
+  	if (schedA.line6) schedA.line9 += parseFloat(schedA.line6);
+  	if (schedA.line7) schedA.line9 += parseFloat(schedA.line7);
+  	if (schedA.line8) schedA.line9 += parseFloat(schedA.line8);
+  	schedA.line9 = schedA.line9.toFixed(2);
+  	
+  	case 10:
+  	schedA.line10 = 0;	
+  	for (i = 0; i <  $scope.form1098s.length; i++) {
+  		if($scope.form1098s[i].box1) schedA.line10 += parseFloat($scope.form1098s[i].box1);
+  		if($scope.form1098s[i].box2) schedA.line10 += parseFloat($scope.form1098s[i].box2);
+  	}
+  	
+  	schedA.line15 = 0;
+  	if (schedA.line10) schedA.line15 += parseFloat(schedA.line10);
+  	if (schedA.line11) schedA.line15 += parseFloat(schedA.line11);
+  	if (schedA.line12) schedA.line15 += parseFloat(schedA.line12);
+  	if (schedA.line13) schedA.line15 += parseFloat(schedA.line13);
+  	if (schedA.line14) schedA.line15 += parseFloat(schedA.line14);
+  	schedA.line15 = schedA.line15.toFixed(2);
+  	
+  	schedA.line19 = 0;
+  	if (schedA.line16) schedA.line19 += parseFloat(schedA.line16);
+  	if (schedA.line17) schedA.line19 += parseFloat(schedA.line17);
+  	if (schedA.line18) schedA.line19 += parseFloat(schedA.line18);
+  	schedA.line19 = schedA.line19.toFixed(2);
+  	
+  	schedA.line24 = 0;
+  	if (schedA.line21) schedA.line24 += parseFloat(schedA.line21);
+  	if (schedA.line22) schedA.line24 += parseFloat(schedA.line22);
+  	if (schedA.line23) schedA.line24 += parseFloat(schedA.line23);
+  	schedA.line24 = schedA.line24.toFixed(2);
+  		
+  	case 25:	
+  	schedA.line25 = $scope.form1040[0].line38;
+  	schedA.line26 = (schedA.line25 * .02).toFixed(2);
+  	schedA.line27 = ((schedA.line24 - schedA.line26) >= 0) ? (schedA.line24 - schedA.line26).toFixed(2) : 0;
+  	
+  	case 29:
+  	schedA.line29 = parseFloat(schedA.line4) + parseFloat(schedA.line9) + parseFloat(schedA.line15) + 
+  		parseFloat(schedA.line19) + parseFloat(schedA.line27);
+  	if (schedA.line20) schedA.line29 += parseFloat(schedA.line20);
+  	if (schedA.line28) schedA.line29 += parseFloat(schedA.line28);
+  	schedA.line29 = schedA.line29.toFixed(2);
+  	}
+  	
+  	if(propagate) $scope.update1040($scope.form1040[0], 40, true); 
+  };
+  
+  //make this accessible to the form
+  $scope.formUpdateSchedA = function (schedA, line, propogate) {
+  	updateSchedA(schedA, line, propogate);
+  }
+   
+  /* Someone has clicked the Save All Data button. Since it's not that much data,
+   * we're just going to always save everything, which simplifies things, instead
+   * figuring out what is new or not. Everything gets sent to local storage, so that 
+   * personal financial data can't get hacked. This does mean that the user has to use the 
+   * same browser.  In the future it would be nice to write the data to a file, so a user
+   * can import/export data, and take it to other devices/browsers.
+   */	
+  $scope.saveAll = function(){
+  	//eventually replace this with a nice clean foreach
+  	window.localStorage.setItem('form1040.02.2014', JSON.stringify($scope.form1040));
+  	window.localStorage.setItem('form8962.02.2014', JSON.stringify($scope.form8962));
+  	window.localStorage.setItem('formSchedC.02.2014', JSON.stringify($scope.formSchedC));
+  	window.localStorage.setItem('formSchedSE.02.2014', JSON.stringify($scope.formSchedSE));
+  	window.localStorage.setItem('formSchedA.02.2014', JSON.stringify($scope.formSchedSE));
+  	window.localStorage.setItem('w2s.02.2014', JSON.stringify($scope.w2s));
+  	window.localStorage.setItem('form1099gs.02.2014', JSON.stringify($scope.form1099gs));
+  	window.localStorage.setItem('form1099ints.02.2014', JSON.stringify($scope.form1099ints));
+  	window.localStorage.setItem('form1099miscs.02.2014', JSON.stringify($scope.form1099miscs));
+  	window.localStorage.setItem('form1098s.02.2014', JSON.stringify($scope.form1098s));
+  	window.localStorage.setItem('overrides.02.2014', JSON.stringify($scope.overrides));
+  };
+  
+  $scope.fedit = {
+    'w2': {}, 'form1099g': {}, 'form1099int': {}, 'form1099misc': {}, 'form1098': {}, 
+    'form1099div' : {}, 'form1099sa': {} 
+  };
+  $scope.feditIndex = {
+    'w2': -1, 'form1099g': -1, 'form1099int': -1, 'form1099misc': -1, 'form1098': -1, 
+    'form1099div' : -1, 'form1099sa': -1 
+  };
+  $scope.fType = null;
+  
+  $scope.updateForm = function() {
+  	if ($scope.feditIndex[$scope.fType] == -1) {
+  		//adding a new form
+  		$scope[$scope.fType + 's'].push($scope.fedit[$scope.fType]);
+  	} else {
+  		$scope[$scope.fType + 's'][$scope.feditIndex[$scope.fType]] = $scope.fedit[$scope.fType];
+  	}
+  	$('#collapse' + $scope.fType).removeClass('in');
+  	$( '#' + $scope.fType + 'add').show();
+  	$scope.fedit[$scope.fType] = {};
+  	$scope.feditIndex[$scope.fType] = -1;
+  	//TODO: trigger appropriate updates here
+  	$scope.update1040($scope.form1040[0], 0, true);
+  };
+  
+  $scope.addForm = function(fType) {
+  	if (fType == 'form1040') {
+  		console.log('got add 1040');
+  	} else {
+  		$scope.fType = fType;
+  		$scope.feditIndex[$scope.fType] = -1;
+  		$scope.fedit[$scope.fType] = {};
+  	}
+  	$( '#' + fType + 'add').hide();
+  };
+  
+  
+  $scope.editForm = function(fType, form, formIndex) {
+    $scope.fType = fType;
+  	$scope.feditIndex[$scope.fType] = formIndex;
+  	$scope.fedit[$scope.fType] = angular.copy(form);
+  	$( '#' + fType + 'add').hide();
+  	//do this instead of $( '#f1099edit' ).click(), so that we don't trigger ng-click
+  	$('#collapse' + fType).addClass('in');
+  };
+  
+  $scope.deleteForm = function(fType, formIndex, formName) {
+  	  $( '#dialog-delete' ).html("<div style='text-align: left'><p>You just indicated you wish to delete " + formName + 
+  	  " from your list of " + fType + "'s. </p>Are you sure you want to do that?</div>");
+  	  $( '#dialog-delete' ).dialog({
+			resizable: false,
+			/*height:140,*/
+			modal: true,
+			buttons: {
+				'Delete Form': function() {
+					$( this ).dialog( 'close' );
+					($scope[fType + 's']).splice(formIndex, 1);
+					$scope.update1040($scope.form1040[0], 0, true);
+					$scope.$apply();
+				},
+				Cancel: function() {
+					$( this ).dialog( 'close' );
+				}
+			}
+		});	
+  };
+  
+  $scope.setOverride = function(field, value) {
+  	$scope.overrides[field] = value;
+  	if (field == 'form1040.line44') {
+		$scope.form1040.line44 = $scope.overrides[field];
+		$scope.update1040($scope.form1040[0], 44, true);
+	} else if (field == 'form8962.line7') {
+		$scope.form8962.line7 = $scope.overrides[field];
+		$scope.update8962($scope.form8962, 0, true);
+	}
+	$scope.$apply();
+  };
+  
+  $scope.removeOverride = function(field) {
+  	$scope.overrides[field] = null;
+  	delete $scope.overrides[field];
+  	if (field == 'form1040.line44') {
+		$scope.form1040.line44 = -1;
+		$scope.update1040($scope.form1040[0]);
+	} else if (field == 'form8962.line7') {
+		$scope.form8962.line7 = -1;
+		$scope.update8962($scope.form8962, 0, true);
+	}
+	$scope.$apply();
+  };
+  
+  $( '#form1040add' ).click();
+  $( '#form1040add' ).hide();
+  
+});
+
+//Add necessary event listeners
+$( document ).ready(function(){
+
+	$( '.filingStatus' ).change(function() {
+    	$('input[name="' + this.name + '"]').not(this).prop('checked', false);
+	});
+	
+	$( '.f104039a' ).change(function() {
+		var checkCount = 0;
+		$( '.f104039a' ).each(function(index, element) {
+			if ( $( this ).prop('checked')) checkCount ++;
+		});
+	$( '#f1040line39a' ).val(checkCount);
+    	
+	});
+	
+});
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+});
+
+/* May want to bring something like this back for more nuanced updates
+$( "#w2box1" ).change(function() {
+	console.log( "You changed an input! " );
+	console.log( $("#w2box1").val() );
+	$("#f1040line7").val( $("#w2box1").val() );
+	$("#f1040line7").change();
+});
+*/
+
+$( '#f1040line22' ).change(function() {
+	/*TODO replace this with a foreach .incomeCalc */
+	alert("got in change line22");
+	$("#f1040line22").val( Number($("#f1040line7").val()) + Number($("#f1040line8a").val()) + Number($("#f1040line9a").val()) +
+							Number($("#f1040line10").val()) + Number($("#f1040line11").val()) + Number($("#f1040line12").val()) +
+							Number($("#f1040line13").val()) + Number($("#f1040line14").val()) + Number($("#f1040line15b").val()) +
+							Number($("#f1040line17").val()) + Number($("#f1040line18").val()) + Number($("#f1040line19").val()) +
+							Number($("#f1040line20b").val()) + Number($("#f1040line21").val())
+	);
+	
+});
+
+taxTableLookup = function(income, status, overrides) {
+	tenthousand = Math.floor(Number(income) / 10000);
+	thousand = Math.floor((income % 10000) / 1000);
+	hundred = Math.floor((income % 1000) / 100);
+	isUpper = (income % 100) >= 50 ? "upper" : "lower";
+		taxTable = [{"2":{"0":{"0": {"lower": {"single":"2550"}, "upper":{"single":"2558"}}, 
+							"1":{"lower": {"single":"2565"}, "upper":{"single":"2573"}},
+							"2":{"lower": {"single":"2580"}, "upper":{"single":"2588"}},
+							"3":{"lower": {"single":"2595"}, "upper":{"single":"2603"}},
+							"4":{"lower": {"single":"2610"}, "upper":{"single":"2618"}},
+							"5":{"lower": {"single":"2625"}, "upper":{"single":"2633"}},
+							"6":{"lower": {"single":"2640"}, "upper":{"single":"2648"}},
+							"7":{"lower": {"single":"2655"}, "upper":{"single":"2663"}},
+							"8":{"lower": {"single":"2670"}, "upper":{"single":"2678"}},
+							"9":{"lower": {"single":"2685"}, "upper":{"single":"2693"}}},
+						"1":{"0": {"lower": {"single":"2700"}, "upper":{"single":"2708"}}, 
+							"1":{"lower": {"single":"2715"}, "upper":{"single":"2723"}},
+							"2":{"lower": {"single":"2730"}, "upper":{"single":"2738"}},
+							"3":{"lower": {"single":"2745"}, "upper":{"single":"2753"}},
+							"4":{"lower": {"single":"2760"}, "upper":{"single":"2768"}},
+							"5":{"lower": {"single":"2775"}, "upper":{"single":"2783"}},
+							"6":{"lower": {"single":"2790"}, "upper":{"single":"2798"}},
+							"7":{"lower": {"single":"2805"}, "upper":{"single":"2813"}},
+							"8":{"lower": {"single":"2820"}, "upper":{"single":"2828"}},
+							"9":{"lower": {"single":"2835"}, "upper":{"single":"2843"}}},
+						"2":{"0": {"lower": {"single":"2850"}, "upper":{"single":"2858"}}, 
+							"1":{"lower": {"single":"2865"}, "upper":{"single":"2873"}},
+							"2":{"lower": {"single":"2880"}, "upper":{"single":"2888"}},
+							"3":{"lower": {"single":"2895"}, "upper":{"single":"2903"}},
+							"4":{"lower": {"single":"2910"}, "upper":{"single":"2918"}},
+							"5":{"lower": {"single":"2925"}, "upper":{"single":"2933"}},
+							"6":{"lower": {"single":"2940"}, "upper":{"single":"2948"}},
+							"7":{"lower": {"single":"2955"}, "upper":{"single":"2963"}},
+							"8":{"lower": {"single":"2970"}, "upper":{"single":"2978"}},
+							"9":{"lower": {"single":"2985"}, "upper":{"single":"2993"}}},
+					   "4":{"0":{"lower": {"single":"3150"}, "upper":{"single":"3158"}}, 
+							"1":{"lower": {"single":"3165"}, "upper":{"single":"3173"}},
+							"2":{"lower": {"single":"3180"}, "upper":{"single":"3188"}},
+							"3":{"lower": {"single":"3195"}, "upper":{"single":"3203"}},
+							"4":{"lower": {"single":"3210"}, "upper":{"single":"3218"}},
+							"5":{"lower": {"single":"3225"}, "upper":{"single":"3233"}},
+							"6":{"lower": {"single":"3240"}, "upper":{"single":"3248"}},
+							"7":{"lower": {"single":"3255"}, "upper":{"single":"3263"}},
+							"8":{"lower": {"single":"3270"}, "upper":{"single":"3278"}},
+							"9":{"lower": {"single":"3285"}, "upper":{"single":"3293"}}},
+					   "5":{"0":{"lower": {"single":"3300"}, "upper":{"single":"3308"}},
+							"1":{"lower": {"single":"3315"}, "upper":{"single":"3323"}},
+							"2":{"lower": {"single":"3330"}, "upper":{"single":"3338"}},
+							"3":{"lower": {"single":"3345"}, "upper":{"single":"3353"}},
+							"4":{"lower": {"single":"3360"}, "upper":{"single":"3368"}},
+							"5":{"lower": {"single":"3375"}, "upper":{"single":"3383"}},
+							"6":{"lower": {"single":"3390"}, "upper":{"single":"3398"}},
+							"7":{"lower": {"single":"3405"}, "upper":{"single":"3413"}},
+							"8":{"lower": {"single":"3420"}, "upper":{"single":"3428"}},
+							"9":{"lower": {"single":"3435"}, "upper":{"single":"3443"}}},
+					"7":{"0":{"0": {"lower": {"single":"13363"}, "upper":{"single":"13375"}}, 
+							"1":{"lower": {"single":"13388"}, "upper":{"single":"13400"}},
+							"2":{"lower": {"single":"13413"}, "upper":{"single":"13425"}},
+							"3":{"lower": {"single":"13438"}, "upper":{"single":"13450"}},
+							"4":{"lower": {"single":"13463"}, "upper":{"single":"13475"}},
+							"5":{"lower": {"single":"13488"}, "upper":{"single":"13500"}},
+							"6":{"lower": {"single":"13513"}, "upper":{"single":"13525"}},
+							"7":{"lower": {"single":"13538"}, "upper":{"single":"13550"}},
+							"8":{"lower": {"single":"13563"}, "upper":{"single":"13575"}},
+							"9":{"lower": {"single":"13588"}, "upper":{"single":"13600"}}},
+						"1":{"0": {"lower": {"single":"13613"}, "upper":{"single":"13625"}}, 
+							"1":{"lower": {"single":"13638"}, "upper":{"single":"13650"}},
+							"2":{"lower": {"single":"13663"}, "upper":{"single":"13675"}},
+							"3":{"lower": {"single":"13688"}, "upper":{"single":"13700"}},
+							"4":{"lower": {"single":"13713"}, "upper":{"single":"13725"}},
+							"5":{"lower": {"single":"13738"}, "upper":{"single":"13750"}},
+							"6":{"lower": {"single":"13763"}, "upper":{"single":"13775"}},
+							"7":{"lower": {"single":"13788"}, "upper":{"single":"13800"}},
+							"8":{"lower": {"single":"13813"}, "upper":{"single":"13825"}},
+							"9":{"lower": {"single":"13838"}, "upper":{"single":"13850"}}}
+							
+		}}}];
+		if (taxTable["0"][tenthousand]) {
+			if (taxTable["0"][tenthousand][thousand]) {
+				if (taxTable["0"][tenthousand][thousand][hundred]) {
+					return taxTable["0"][tenthousand][thousand][hundred][isUpper][status];
+				} 
+			} 
+		} 
+	 return -1;
+	};
+	
+povertyLineLookup = function(famSize) {
+	povertyLineTable = [{
+	  '1': '11490', '2': '15510', '3': '19530', '4': '23550', '5': '27570', '6': '31590', 
+	  '7': '35610', '8': '39630'
+	}];
+	povertyLine = povertyLineTable['0'][famSize];
+	return povertyLine;
+}
+
+applicableFigureLookup = function(percent) {
+	appFigureTable = [{"270": "0.0863", "271": "0.0866", "272": "0.0869", "273": "0.0872", 
+		"274": "0.0875", "275": "0.0878", "276": "0.0880", "277": "0.0883", "278": "0.0886",
+		"279": "0.0889", "280": "0.0892", "281": "0.0895", "282": "0.0898", "283": "0.0901",
+		"284": "0.0904", "285": "0.0907", "286": "0.0909", "287": "0.0912", "288": "0.0915",
+		"289": "0.0918", "290": "0.0921", "291": "0.0924", "292": "0.0927", "293": "0.0930",
+		"294": "0.0933", "295": "0.0936", "296": "0.0938", "297": "0.0941", "298": "0.0944",
+		"299": "0.0947"
+	}];
+	if (percent >= 400) { return 0.1; }
+	else if (percent >= 300) { return 0.0950; }
+	else if (percent <= 133) { return 0.02; }
+	else if (percent < 270) { 
+		return -1;
+	}
+	else { return appFigureTable['0'][percent]; }
+}
+
+overrideValue = function(field, element) {
+	var scope = angular.element(element).scope();
+  	if (field == 'form1040.line44') {
+  		$( '#dialog-override-msg' ).html("The Tax Calculator has not gotten updated yet " +
+		"with the data you need from the tax table. You can override the lookup by entering the value here.");
+	} else if (field == 'form8962.line7') {
+		$( '#dialog-override-msg' ).html("The Tx Calculator doesn't have the Applicable Figure you need, yet. " +
+		"You can override the lookup by entering the value here.");
+	}
+  	  	$( '#dialog-override' ).dialog({
+			resizable: false,
+			modal: true,
+			buttons: {
+				'Submit': function() {
+					$( this ).dialog( 'close' );
+					var override = $( '#override' ).val();
+					scope.setOverride(field, override);
+					$( '#override' ).val('');
+				},
+				Cancel: function() {
+					$( this ).dialog( 'close' );
+				}
+  			}
+  		});
+}
+
+removeOverride = function(field, element) {
+	var scope = angular.element(element).scope();
+	scope.removeOverride(field);
+}
+
+</script>
+
+</body>
+</html>
