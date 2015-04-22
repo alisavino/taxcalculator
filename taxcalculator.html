@@ -3,34 +3,32 @@
 <head>
 
 <!-- start jquery includes  -->
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<!-- <script src="js/jquery-2.1.3.min.js"></script> -->
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css" />
-<!-- <link rel="stylesheet" href="css/jquery-ui.css" /> 
-<script src="js/jquery-ui.min.js"></script> -->
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
-<!-- end jquery ui includes -->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> -->
+<script src="js/jquery-2.1.3.min.js"></script> 
+<!-- <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css" /> -->
+<link rel="stylesheet" href="css/jquery-ui.css" /> 
+<script src="js/jquery-ui.min.js"></script> 
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+ end jquery ui includes -->
 
 
 <!-- start bootstrap includes -->
 <!-- Latest compiled and minified Bootstrap CSS -->
-
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"> 
-<!-- <link rel="stylesheet" href="css/bootstrap.min.css" /> -->
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="css/bootstrap.min.css" /> 
 
 <!-- Optional theme  -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css"> 
-<!-- <link rel="stylesheet" href="css/bootstrap-theme.min.css" /> -->
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css"> -->
+<link rel="stylesheet" href="css/bootstrap-theme.min.css" /> 
 
-<!-- Latest compiled and minified Bootstrap JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<!-- <script src="js/bootstrap.min.js"></script>
- end bootstrap includes -->
+<!-- Latest compiled and minified Bootstrap JavaScript 
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script> -->
+<script src="js/bootstrap.min.js"></script>
+<!-- end bootstrap includes -->
 
-<!-- start angular includes -->
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script> 
-<!-- <script src="js/angular.min.js"></script> -->
+<!-- start angular includes 
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script> -->
+<script src="js/angular.min.js"></script> 
 <!-- end angular includes -->
 
 <!-- start tax calculator includes
@@ -911,7 +909,7 @@ end taxcaclulator includes -->
     <br><br>
     
     <div class="collapse" id="collapseform1040">
-    <form ng-repeat="f1040 in form1040" ng-model="f1040" ng-submit="update1040(form1040[0], 0 , true)" 
+    <form ng-repeat="f1040 in form1040" ng-model="f1040" ng-submit="formUpdateFilingStatus(f1040);update1040(form1040[0], 0 , true)" 
     class="form-horizontal" role="form" id="form1040">
     
     <h3> Filing Status </h3>
@@ -2543,7 +2541,6 @@ must attach Form 8283 if over $500 </span>
   	TODO: add line32 for losses<br>
   	TODO: add Part III Cost of Goods Sold<br>
   	TODO: add Part IV Information on Your Vehicle <br>
-  	
   	<h3> Other Expenses </h3>
   	List below business expenses not included on lines 8 through 26 - or line 30.
   	<div class="row">
@@ -2653,9 +2650,10 @@ must attach Form 8283 if over $500 </span>
       <input type="text" ng-model="schedC.line48" class="form-control" name="schedCline48" id="schedCline48">
   	</div>
   	<br>
-  	<!-- end Other Expenses -->  	
+  	<!-- end Other Expenses -->
+  	
+  	
   	<br><br>
-
   	<div class="input-group">
         <button class="btn" type="submit" value="add">update Form Schedule C</button>
     </div>
@@ -2745,7 +2743,7 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
     	  'line32c': '0', 'line32d': '0', 'line32e': '0', 'line32f': '0', 'line32g': '0',
     	  'line33c': '0', 'line33d': '0', 'line33e': '0', 'line33f': '0', 'line33g': '0',
     	  'line34': '0', 'line35a': '0', 'line35b': '0', 'line35c': '0', 'line35d': '0',
-    	  'line36a': '0', 'line36b': '0', 'line36c': '0', 'line36d': '0'
+    	  'line36a': '0', 'line36b': '0', 'line36c': '0', 'line36d': '0',
     	}];
     }
     $scope.form8962 = f8962;
@@ -2852,11 +2850,10 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
   };
   
   $scope.loadAll($scope.form1040, $scope.form8962, $scope.w2s, $scope.form1099gs, $scope.form1099ints, 
-  $scope.form1099miscs, $scope.form1098s, $scope.formSchedA, $scope.formSchedSE, $scope.formSchedC, $scope.overrides);
+  	$scope.form1099miscs, $scope.form1098s, $scope.formSchedA, $scope.formSchedSE, $scope.formSchedC, $scope.overrides);
   	
   /* if Schedule C line 31 changes, then Schedule SE line 2 needs to be updated */
   $scope.updateSchedSE = function (schedSE, line, propagate) {
-  	console.log('got in update Schedule SE');
   	schedSE['sectionA'].line2 = $scope.formSchedC[0].line31;
   	schedSE['sectionA'].line3 = (parseFloat(schedSE['sectionA'].line1a) + parseFloat(schedSE['sectionA'].line1b) + 
   		parseFloat(schedSE['sectionA'].line2)).toFixed(2);
@@ -2867,7 +2864,6 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
   		schedSE['sectionA'].line5 = (schedSE['sectionA'].line4 * .029 + 14508).toFixed(2);
   	}
   	schedSE['sectionA'].line6 = (schedSE['sectionA'].line5 * .5).toFixed(2);
-
   	if (propagate) $scope.update1040($scope.form1040[0], 12, true);
   };
   
@@ -2875,7 +2871,6 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
    * If a Schedule C, Section 5 value changes, then Schedule C line 27a and line 48 and everything after needs to be updated.
    */
   $scope.updateSchedC = function (schedC, line, propagate) {
-    console.log('updating schedule C');
   	schedC.line1 = 0;
   	for (i = 0; i <  $scope.form1099miscs.length; i++) {
   		if($scope.form1099miscs[i].box7) schedC.line1 += parseFloat($scope.form1099miscs[i].box7);
@@ -2929,10 +2924,10 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
    * If Form 8962 line 26 changes, then 1040 line 69 and after need to be updated.
    */
   $scope.update1040 = function (f1040, line, propagate) {
-	console.log('got in update 1040');
+
 	switch(line) {
     case 0:
-    console.log('updating 1040 from line 0');
+    //updateFilingStatus(f1040);
   	f1040.line7 = 0;
   	for (i = 0; i <  $scope.w2s.length; i++) {
   		if($scope.w2s[i].box1) f1040.line7 += parseFloat($scope.w2s[i].box1);
@@ -2959,7 +2954,6 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
   	$scope.updateSchedC($scope.formSchedC[0], 0, false);
   	
   	case 12:
-  	console.log('updating 1040 from line 12, f1040.line7: ' + f1040.line7);
   	f1040.line12 = $scope.formSchedC[0].line31;
   	
   	f1040.line22 = 0;
@@ -2990,10 +2984,14 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
   	updateSchedA($scope.formSchedA[0], 2, false);
   	
   	case 40:
-  	console.log('updating from line 40');
   	//for now, just use standard deduction, until Sched A interaction is figured out
   	//Single or Married filing separately, $6,200 Married filing jointly or Qualifying widow(er), 
   	//$12,400 Head of household, $9,100 
+  	console.log('1040 line 1: ' + f1040.line1);
+  	console.log('1040 line 2: ' + f1040.line2);
+  	console.log('1040 line 3: ' + f1040.line3);
+  	console.log('1040 line 4: ' + f1040.line4);
+  	console.log('1040 line 5: ' + f1040.line5);
   	var trueVal = new String('true').valueOf();
   	if((new String(f1040.line1).valueOf() == trueVal) || (new String(f1040.line3).valueOf() == trueVal)) f1040.line40 = 6200;
   	if((new String(f1040.line2).valueOf() == trueVal) || (new String(f1040.line5).valueOf() == trueVal)) f1040.line40 = 12400;
@@ -3116,7 +3114,6 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
   		parseFloat(f8962[0].line16e) + parseFloat(f8962[0].line17e) + parseFloat(f8962[0].line18e) +
   		parseFloat(f8962[0].line19e) + parseFloat(f8962[0].line20e) + parseFloat(f8962[0].line21e) +
   		parseFloat(f8962[0].line22e) + parseFloat(f8962[0].line23e)).toFixed(2);
-  		
   	//Advance Payment of PTC: Enter the amount from line 11F or 
   	//add lines 12F through 23F and enter the total here 
   	f8962[0].line25 = f8962[0].line11f;
@@ -3136,7 +3133,6 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
 	//line 24 from line 25. Enter the difference here
 	f8962[0].line27 = 0;
 	if (f8962[0].line24 < f8962[0].line25) f8962[0].line27 = f8962[0].line25 - f8962[0].line24;
-	
 	if(propagate) $scope.update1040($scope.form1040[0], 69, true); 
   };
 
@@ -3152,7 +3148,7 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
    */
   //$scope.updateSchedA = function (schedA, line, propagate) {
   function updateSchedA (schedA, line, propagate) {
-    console.log('got in updateSchedA with line: ' + line + ' and propagate: ' + propagate);
+  
     switch(line) {
     case 0:
     case 2:
@@ -3246,7 +3242,6 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
     'w2': -1, 'form1099g': -1, 'form1099int': -1, 'form1099misc': -1, 'form1098': -1, 
     'form1099div' : -1, 'form1099sa': -1 
   };
-  
   $scope.fType = null;
   
   $scope.updateForm = function() {
@@ -3334,6 +3329,20 @@ taxCalcApp.controller('TaxFormCtrl', function ($scope) {
   $( '#form1040add' ).click();
   $( '#form1040add' ).hide();
   
+  //because we are mimicking the weird IRS checkbox behavior, we need to update the values manually
+  function updateFilingStatus (f1040) {
+    $( '#f1040line1' ).prop('checked') ? f1040.line1 = true : f1040.line1 = false;
+    $( '#f1040line2' ).prop('checked') ? f1040.line2 = true : f1040.line2 = false;
+    $( '#f1040line3' ).prop('checked') ? f1040.line3 = true : f1040.line3 = false;
+    $( '#f1040line4' ).prop('checked') ? f1040.line4 = true : f1040.line4 = false;
+    $( '#f1040line5' ).prop('checked') ? f1040.line5 = true : f1040.line5 = false;
+  };
+  
+  //make this accessible to the form
+  $scope.formUpdateFilingStatus = function (f1040) {
+  	updateFilingStatus(f1040);
+  }
+  
 });
 
 //Add necessary event listeners
@@ -3341,6 +3350,7 @@ $( document ).ready(function(){
 
 	$( '.filingStatus' ).change(function() {
     	$('input[name="' + this.name + '"]').not(this).prop('checked', false);
+    	$('input[name="' + this.name + '"]').not(this).val('');
 	});
 	
 	$( '.f104039a' ).change(function() {
@@ -3456,7 +3466,6 @@ taxTableLookup = function(income, status, overrides) {
 							"9":{"lower": {"single":"13838"}, "upper":{"single":"13850"}}}
 							
 		}}}];
-
 		if (taxTable["0"][tenthousand]) {
 			if (taxTable["0"][tenthousand][thousand]) {
 				if (taxTable["0"][tenthousand][thousand][hundred]) {
